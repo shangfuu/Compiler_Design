@@ -7,3 +7,6 @@ lex.yy.c
 
 # Execution file
 *.exe
+
+# Scanner file
+scanner
