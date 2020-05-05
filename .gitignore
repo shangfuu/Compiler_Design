@@ -10,3 +10,6 @@ lex.yy.c
 
 # Scanner file
 scanner
+
+# reference file
+ref.l
