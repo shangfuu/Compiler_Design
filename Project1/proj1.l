@@ -8,9 +8,24 @@
 
 int linenum = 1;
 char buf[MAX_LINE_LENG];
+
 %}
 
+/* Operators */
+Arith_OP [+-*/]
+Relat_OP "<="|">="|"=="|"!="|"<"|">"
+Logi_OP "&&"|"||"|"!"
+
+
+
 %%
+
+while {token("while");}
+
+y {token('y');}
+
+"x" {token('x');}
+
 "("     {token('(');}
 
 \n      {
@@ -23,8 +38,17 @@ char buf[MAX_LINE_LENG];
 
 .       {
         LIST;
-        printf("%d:%s\n", linenum+1, buf);
+        printf("%d:%s\n", linenum, buf);
         printf("bad character:'%s'\n",yytext);
         exit(-1);
         }
+
 %%
+
+
+int main() {
+	// Open debug mode in lex
+	yy_flex_debug = 1;
+	yylex();
+	return 0;
+}
