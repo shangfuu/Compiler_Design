@@ -5,9 +5,9 @@ lex: $(lex_file)
 	$(LEX) $(lex_file)
 	cc -o scanner -O lex.yy.c -ll
 
-.PHONT: d
+.PHONT: DEBUG
 
-d: $(lex_file)
+DEBUG: $(lex_file)
 	$(LEX) -d $(lex_file)
 	cc -o scanner -O lex.yy.c -ll
 
