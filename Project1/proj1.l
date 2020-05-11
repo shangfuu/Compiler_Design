@@ -16,7 +16,7 @@ char buf[MAX_LINE_LENG];
 %}
 
 %option noyywrap yylineno
-%x COMMENTS
+%x COMMENT
 
 digit [0-9]
 letter [a-zA-Z]
@@ -179,18 +179,50 @@ true	{
 		}
 
  /* STRING CONSTANTS */
-\"[^\"]*\"	{
-		tokenString(STRING, yytext);
+\"(\"\"|[^\"\n])*\"	{
+
+		/* Need Else Only */
+		int nextc = input();	// Read the next character
+		if (nextc == '"') {
+			unput(nextc);	// Put char back to read again later
+			yymore();	// Cause the next token's yytext to include current yytext
+		}
+		else {
+			char *tokenS = (char *)malloc(yyleng * sizeof(char));
+			char *temp = (char *)malloc(yyleng * sizeof(char));
+
+			// Take off the "" from the front and rear.
+			for(int i = 1; i < yyleng - 1; i++) {
+				temp[i-1] = yytext[i];
+			}
+
+			// Change "" to "
+			for (int i = 0, j = 0; i < strlen(temp); i++) {
+				if (temp[i] == '"') {
+					if (i+1 < strlen(temp) && temp[i+1] == '"'){
+						tokenS[j++] = temp[i];
+						i = i + 1;
+					}
+				}
+				else {
+					tokenS[j++] = temp[i];
+				}
+			}
+			tokenString(STRING, tokenS);
+			free(tokenS);
+			free(temp);
+			unput(nextc);	// Put char back to read again later
+		}
 		}
 
  /* COMMENTS */
 "//" 	{
-		BEGIN COMMENTS;
+		BEGIN COMMENT;
 		token("//");
 		}
 
 "/*"	{
-		BEGIN COMMENTS;
+		BEGIN COMMENT;
 		token("/*");
 		}
 
