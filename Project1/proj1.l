@@ -16,12 +16,13 @@ char buf[MAX_LINE_LENG];
 %}
 
 %option noyywrap yylineno
+%x COMMENTS
 
 digit [0-9]
 letter [a-zA-Z]
 
 delim [,:.;\(\)\[\]\{\}]
-OP_arith [-%\+\*\/]
+OP_arith [-%+*/]
 OP_relat <|<=|>=|>|==|!=
 OP_logic "&&"|"||"|"!"
 
@@ -178,16 +179,27 @@ true	{
 		}
 
  /* STRING CONSTANTS */
-\"({letter}|{digit}|\"|\t|" ")*\"	{
+\"[^\"]*\"	{
 		tokenString(STRING, yytext);
 		}
 
  /* COMMENTS */
+"//" 	{
+		BEGIN COMMENTS;
+		token("//");
+		}
+
+"/*"	{
+		BEGIN COMMENTS;
+		token("/*");
+		}
+
 
 <<EOF>> {
 		yyterminate();
 		}
 
+ /* DISCARD TOKEN */
 \n      {
         LIST;
         printf("%d: %s", linenum++, buf);
