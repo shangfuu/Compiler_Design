@@ -16,7 +16,7 @@ char buf[MAX_LINE_LENG];
 %}
 
 %option noyywrap yylineno
-%x COMMENT
+%x COMMENTB
 
 digit [0-9]
 letter [a-zA-Z]
@@ -186,7 +186,8 @@ true	{
 			unput(nextc);	// Put char back to read again later
 			yymore();	// Cause the next token's yytext to include current yytext
 		}
-		else { /* Need Else Only, uppper code can delete */
+		/* Need Else Only, uppper code can delete */
+		else { 
 			char *tokenS = (char *)malloc(yyleng * sizeof(char));
 			char *temp = (char *)malloc(yyleng * sizeof(char));
 
@@ -216,23 +217,31 @@ true	{
 
 
  /* LINE COMMENTS */
-"//" 	{
-		BEGIN COMMENT;
-		token("//");
+\/\/[^\n]* 	{
+		LIST;
 		}
-
-
-<COMMENT>\n {
-		token();
-		}
-
 
  /* BLOCK COMMENTS */
 "/*"	{
-		BEGIN COMMENT;
-		token("/*");
+		BEGIN COMMENTB;
+		LIST;
 		}
 
+<COMMENTB>.	{
+		// Matches everythin except newline.
+		LIST;
+		}
+
+<COMMENTB>\n	{
+		LIST;
+		printf("%d: %s", linenum++, buf);
+		buf[0] = '\0';
+		}
+
+<COMMENTB>"*/"	{
+		BEGIN 0;
+		LIST;
+		}
 
 <<EOF>> {
 		yyterminate();
