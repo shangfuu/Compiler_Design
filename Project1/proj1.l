@@ -181,13 +181,12 @@ true	{
  /* STRING CONSTANTS */
 \"(\"\"|[^\"\n])*\"	{
 
-		/* Need Else Only */
 		int nextc = input();	// Read the next character
 		if (nextc == '"') {
 			unput(nextc);	// Put char back to read again later
 			yymore();	// Cause the next token's yytext to include current yytext
 		}
-		else {
+		else { /* Need Else Only, uppper code can delete */
 			char *tokenS = (char *)malloc(yyleng * sizeof(char));
 			char *temp = (char *)malloc(yyleng * sizeof(char));
 
@@ -215,12 +214,20 @@ true	{
 		}
 		}
 
- /* COMMENTS */
+
+ /* LINE COMMENTS */
 "//" 	{
 		BEGIN COMMENT;
 		token("//");
 		}
 
+
+<COMMENT>\n {
+		token();
+		}
+
+
+ /* BLOCK COMMENTS */
 "/*"	{
 		BEGIN COMMENT;
 		token("/*");
