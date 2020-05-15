@@ -6,12 +6,38 @@
 
 #define MAX_LINE_LENG 256
 
+#include <stdio.h>
+
 #define IDENTIFIER "id"
 #define INTEGER "int"
 #define STRING "string"
 
 int linenum = 1;
 char buf[MAX_LINE_LENG];
+
+
+// Symbol Table: using hash table
+#define TABLE_SIZE 53
+
+typedef struct node_{
+	char *name;
+	struct node_ *next;
+	int index;
+} Node;
+
+typedef struct hash_table_{
+	Node **table;
+	int size;
+} HashTable;
+
+
+HashTable* create();
+int lookup(char*);
+void insert(char*);
+void dump();
+
+// Hash function: djb2
+unsigned int hash(unsigned char*);
 
 %}
 
@@ -266,10 +292,42 @@ true	{
 
 %%
 
+ /* Hash Function: djb2 by Dan Bernstein */
+unsigned int hash(unsigned char *str){
+	unsigned int hash = 0U;
+	int c;
+
+	while(c = *str++){
+		hash = ((hash << 5) + hash) ^ c;	// hash * 33 ^ c
+	}
+	return hash;
+}
+
+HashTable* create(){
+	HashTable *symbol_table = malloc(sizeof(HashTable));
+	symbol_table->table = malloc(sizeof(Node) * TABLE_SIZE);
+	memset(symbol_table->table, 0, sizeof(Node) * TABLE_SIZE);
+
+	return symbol_table;
+}
+
+int lookup(char *str){
+	return NULL;
+}
+
+void insert(char *str){
+
+}
+
+void dump(){
+
+}
+
 
 int main() {
 	// Open debug mode in lex
 	yy_flex_debug = 1;
 	yylex();
+	
 	return 0;
 }
