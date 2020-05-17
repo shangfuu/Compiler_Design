@@ -101,10 +101,13 @@ void dump(HashTable* symbol_table){
     for(int i = 0 ; i < TABLE_SIZE; i++){
         // Traverse table entry
         Node* entry = symbol_table->table[i];
+        if (entry != NULL){
+            printf("\n%d:", i);
+        }
         while (entry != NULL){
-            printf("%s\n", entry->name);
+            printf(" %s", entry->name);
             entry = entry->next;
         }
     }
-
+    printf("\n");
 }
