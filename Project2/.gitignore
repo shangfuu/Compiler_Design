@@ -1,0 +1,9 @@
+# object file
+*.o
+*.out
+
+# lex
+lex.yy.*
+
+# yacc
+y.tab.*

@@ -1,28 +1,20 @@
 %{
 
-// #include "y.tab.hpp"
-
+#include "y.tab.hpp"
 #define LEX_DEBUG 0
 
 #define LIST     strcat(buf,yytext)
 // Add return
 #define token(t) {	LIST; if(LEX_DEBUG){ printf("<%s>\n", #t);} return t; }
-#define tokenInteger(t,i) {LIST; if(LEX_DEBUG){ printf("<%s: %d>\n",t,i);} }
-#define tokenString(t,s) {LIST; if(LEX_DEBUG){ printf("<%s: %s>\n",t,s);} }
+#define tokenInteger(t,i) {LIST; if(LEX_DEBUG){ printf("<%s: %d>\n",#t,i);} }
+#define tokenString(t,s) {LIST; if(LEX_DEBUG){ printf("<%s: %s>\n",#t,s);} }
+#define tokenFloat(t,f)  {LIST; if(LEX_DEBUG){ printf("<%s: %lf>\n",#t,f);} }
 
 #define MAX_LINE_LENG 256
 
-#include "hash_table.h"
-
-#define IDENTIFIER "id"
-#define INTEGER "int"
-#define STRING "string"
 
 int linenum = 1;
 char buf[MAX_LINE_LENG];
-
-HashTable * SymbolTable;
-
 %}
 
 %option noyywrap yylineno
@@ -35,33 +27,9 @@ delim [,:.;\(\)\[\]\{\}]
 OP_arith [-%+*/]
 OP_relat <|<=|>=|>|==|!=
 OP_logic "&&"|"||"|"!"
+assign =
 
 %%
-
-{delim} {
-		token(yytext);
-		}
-
- /* OPERATOR */
- /* Abandoned */
-= 		{
-		token(yytext);
-		}
-
- /* Arithmetic */
-{OP_arith} {
-		token(yytext);
-		}
-
- /* Relational */
-{OP_relat} {
-		token(yytext);
-		}
-
- /* Logical */
-{OP_logic} {
-		token(yytext);
-		}
 
  /* KEYWORDS */
 boolean {
@@ -120,8 +88,9 @@ int 	{
 		token(INT);
 		}
 
+ /* Change NULL to NILL because there will be error using c keyword NULL*/ 
 null  	{
-		token(NULL);
+		token(NIL);
 		}
 
 object  {
@@ -177,58 +146,124 @@ true	{
 		token(TRUE);
 		}
 
+ /* Add KEYWORDS read */
+read	{
+		token(READ);
+		}
+
+
+
+ /* Delim */
+{delim} {
+		token(*yytext);
+		}
+
+ /* OPERATOR: new version */
+
+ /* Arithmetic */
+{OP_arith} {
+		token(*yytext);
+		}
+
+ /* Assign */
+{assign} {
+		token(*yytext);
+		}
+
+ /* Relational */
+"<"		{
+		token(LT);
+		}
+
+"<="	{
+		token(LE);
+		}
+
+">"		{
+		token(GT);
+		}
+
+">="	{
+		token(GE);
+		}
+
+"!="	{
+		token(NE);
+		}
+
+"=="	{
+		token(EE);
+		}
+
+ /* Logical */
+"&&"	{
+		token(AND);
+		}
+
+"||"	{
+		token(OR);
+		}
+
+"!"		{
+		token(NOT);
+		}
 
  /* IDENTIFIERS */
 {letter}({digit}|{letter})* {
-		insert(SymbolTable, yytext);
-		tokenString(IDENTIFIER , yytext);
+
+		// insert(SymbolTable, yytext);
+		tokenString("id" , yytext);
+		return ID;
 		}
 
  /* INTEGER CONSTANTS */
 {digit}+ {
-		tokenInteger(INTEGER, atoi(yytext));
+		tokenInteger("int", atoi(yytext));
+		return CONST_INT;
 		}
 
  /* REAL CONSTANTS */
 [+-]?({digit}+\.{digit}*|{digit}*\.{digit}+)([Ee][+-]?[0-9]+)? {
-		token(yytext);
+		double f;
+		sscanf(yytext, "%lf", &f);
+		tokenFloat("float", f);
+		return CONST_REAL;
 		}
 
  /* STRING CONSTANTS */
 \"(\"\"|[^\"\n])*\"	{
 
-		int nextc = input();	// Read the next character
-		if (nextc == '"') {
-			unput(nextc);	// Put char back to read again later
-			yymore();	// Cause the next token's yytext to include current yytext
+		char *tokenS = (char *)malloc(yyleng * sizeof(char));
+		char *temp = (char *)malloc(yyleng * sizeof(char));
+
+		// Take off the "" from the front and rear.
+		for(int i = 1; i < yyleng - 1; i++) {
+			temp[i-1] = yytext[i];
 		}
-		/* Need Else Only, uppper code can delete */
-		else { 
-			char *tokenS = (char *)malloc(yyleng * sizeof(char));
-			char *temp = (char *)malloc(yyleng * sizeof(char));
 
-			// Take off the "" from the front and rear.
-			for(int i = 1; i < yyleng - 1; i++) {
-				temp[i-1] = yytext[i];
-			}
-
-			// Change "" to "
-			for (int i = 0, j = 0; i < strlen(temp); i++) {
-				if (temp[i] == '"') {
-					if (i+1 < strlen(temp) && temp[i+1] == '"'){
-						tokenS[j++] = temp[i];
-						i = i + 1;
-					}
-				}
-				else {
+		// Change "" to "
+		for (int i = 0, j = 0; i < strlen(temp); i++) {
+			if (temp[i] == '"') {
+				if (i+1 < strlen(temp) && temp[i+1] == '"'){
 					tokenS[j++] = temp[i];
+					i = i + 1;
 				}
 			}
-			tokenString(STRING, tokenS);
-			free(tokenS);
-			free(temp);
-			unput(nextc);	// Put char back to read again later
+			else {
+				tokenS[j++] = temp[i];
+			}
 		}
+		tokenString("string", tokenS);
+		free(tokenS);
+		free(temp);
+		return CONST_STRING;
+		}
+
+ /* CHAR CONSTANTS */
+\'(\'\'|[^\'\n])\'	{
+
+		tokenString("char", yytext);
+		return CONST_CHAR;
 		}
 
 
@@ -244,7 +279,7 @@ true	{
 		}
 
 <COMMENTB>.	{
-		// Matches everythin except newline.
+		// Matches everything except newline.
 		LIST;
 		}
 
@@ -257,10 +292,6 @@ true	{
 <COMMENTB>"*/"	{
 		BEGIN 0;
 		LIST;
-		}
-
-<<EOF>> {
-		yyterminate();
 		}
 
  /* DISCARD TOKEN */
@@ -276,23 +307,8 @@ true	{
         LIST;
         printf("%d:%s\n", linenum, buf);
         printf("bad character:'%s'\n",yytext);
-        //exit(-1);
-		yyterminate();
+		exit(-1);
         }
 
 %%
 
-int main(int argc, char const * argv) {
-	// Open debug mode in lex
-	yy_flex_debug = 1;
-	
-	SymbolTable = create();
-
-	yylex();
-
-	// Dumps all entries of the symbol table.
-	printf("\nSymbol Table:\n");
-	dump(SymbolTable);
-
-	return 0;
-}

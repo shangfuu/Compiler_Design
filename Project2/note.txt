@@ -1,0 +1,20 @@
+Modified in Project2 lex: 
+
+1. Not including hash_table.h
+2. Add return at #define token(t). 
+3. Include y.tab.hpp.
+4. Change NULL to NIL, because of c keyword problem.
+5. Add KEYWORDS read.
+6. Take off main function.
+7. Rewrite operator:
+    Rewrite assign operator.
+    Rewrite relational operator.
+    Rewrite logical operator.
+8. Add #define tokenFloat(t,f)
+9. Add char
+10. Delete the define as follow:
+    #define IDENTIFIER "id"
+    #define INTEGER "int"
+    #define STRING "string"
+
+
