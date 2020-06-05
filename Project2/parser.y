@@ -1,5 +1,6 @@
 %{
-#define Trace(t)        printf(t)
+#define YACC_DEBUG 1
+#define Trace(t)    if(YACC_DEBUG){ cout << "Trace: " << t << endl; }
 
 #include "symTable.h"
 #include "lex.yy.cpp"
@@ -9,13 +10,27 @@
 SymbolTables symbol_tables;
 
 void yyerror(string);
+
+// Insert ID in current table (tables[top]).
+void insertTableEntry(SymInfo*);
 %}
+
+/* Used in yylval, use $ in yacc */
+%union{
+    int 	ival;
+    float 	fval;
+    char    cval;
+    bool    bval;
+
+    // pointer use *$
+    string *sval;
+}
 
 /* tokens */
 
 // KEYWORDS
-%token BOOLEAN BREAK CHAR CASE CLASS CONTINUE DEF DO ELSE EXIT FLOAT FOR IF INT READ
-%token NIL OBJECT PRINT PRINTLN REPEAT RETURN STRING TO TYPE VAL VAR WHILE FALSE TRUE
+%token BOOLEAN BREAK CHAR CASE CLASS CONTINUE DEF DO ELSE EXIT FLOAT FOR IF INT 
+%token NIL OBJECT PRINT PRINTLN REPEAT RETURN STRING TO TYPE VAL VAR WHILE READ
 
 // OPERATOR Relational
 %token LT LE GT GE NE EE
@@ -24,28 +39,75 @@ void yyerror(string);
 %token AND OR NOT
 
 // IDENTIFIERS
-%token ID
+%token  <sval>  ID
 
 // CONSTANTS
-%token CONST_INT CONST_REAL CONST_STRING CONST_CHAR
+%token  <bval>  CONST_BOOL
+%token  <ival>  CONST_INT
+%token  <fval>  CONST_REAL
+%token  <sval>  CONST_STRING
+%token  <cval>  CONST_CHAR
 
-
-// TEMPLATE
-%token SEMICOLON
+/* operator PRECEDENCE */
+%left OR
+%left AND
+%left NOT
+%left LT LE GT GE NE EE
+%left '+' '-'
+%left '*' '/'
+%nonassoc UMINUS
 
 %%
-program:        ID semi
+program:
+                OBJECT ID
                 {
-                Trace("Reducing to program\n");
+                    Trace("Reducing to program\n");
+                    // Insert ID in current table.
+                    insertTableEntry(new SymInfo(*$2, DEC_OBJECT));
+                }
+                '{' var_const_decs method_decs '}'
+                {
+                    Trace("Reducing var const or methd decs");
+                    // End block then pop current table.
+                    symbol_tables.pop_table();
                 }
                 ;
 
-semi:           SEMICOLON
-                {
-                Trace("Reducing to semi\n");
-                }
+var_const_decs: 
+                var_const_dec var_const_decs |
+                var_const_dec |
+                /* zero or more */
                 ;
+
+method_decs:    
+                method_dec method_decs |
+                method_dec
+                /* one or more*/
+                ;
+
+var_const_dec:  
+                variable | const
+                ;
+
+method_dec:     
+
+                ;
+
+variable:       
+                ;
+
+const:          
+                ;
+
 %%
+
+void insertTableEntry(SymInfo *id)
+{
+    if (symbol_tables.insert(id) == -1)
+    {
+        yyerror("Insert table entry faild: " + id->get_id_name());
+    }
+}
 
 void yyerror(string msg)
 {

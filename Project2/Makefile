@@ -1,5 +1,5 @@
 CC = g++
-CFLAG = -ll -ly -std=c++11 -W
+CFLAG = -ll -ly -std=c++11
 
 LEX_FILE = scanner.l
 YACC_FILE = parser.y

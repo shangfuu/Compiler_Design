@@ -20,22 +20,22 @@ using namespace std;
 
 // Data Type
 enum _Data_type {
-    TYPE_INT,
-    TYPE_FLOAT,
     TYPE_CHAR,
     TYPE_STRING,
+    TYPE_INT,
     TYPE_BOOL,
+    TYPE_FLOAT,
     TYPE_NONE,
 };
 
 // ID Declaration
 enum _Declare_type {
-    TYPE_VAR,
-    TYPE_VAL,
-    TYPE_OBJECT,
-    TYPE_DEF,
-    TYPE_ARRAY,
-    TYPE_ERROR,
+    DEC_VAL,
+    DEC_VAR,
+    DEC_ARRAY,
+    DEC_OBJECT,
+    DEC_DEF,
+    DEC_ERROR,
 };
 
 /*
@@ -53,10 +53,15 @@ private:
 
 public:
     SymInfo();
+    SymInfo(string, _Declare_type);
+    SymInfo(string, _Data_type);
+    SymInfo(string, _Declare_type, _Data_type);
+
     string get_id_name();
     _Declare_type get_declare_type();
     _Data_type get_data_type();
 
+    void test();
 };
 
 
@@ -73,6 +78,7 @@ private:
 
 public:
     SymTable();
+    ~SymTable();
     // Lookup entries in the table
     SymInfo* lookup(string);
     // Insert the entry, return 1: success, -1: failed
@@ -94,6 +100,7 @@ private:
     int top;    // used as stack
 public:
     SymbolTables();
+    ~SymbolTables();
     // Add a new symTable at the top
     void add_table();
     // Pop the table at the top

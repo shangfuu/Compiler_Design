@@ -5,8 +5,29 @@
 SymInfo::SymInfo()
 {
     id_name = "";
-    declare_type = TYPE_ERROR;
+    declare_type = DEC_ERROR;
     data_type = TYPE_NONE;
+}
+
+SymInfo::SymInfo(string id, _Declare_type dec)
+{
+    id_name = id;
+    declare_type = dec;
+    data_type = TYPE_NONE;
+}
+
+SymInfo::SymInfo(string id, _Data_type type)
+{
+    id_name = id;
+    data_type = type;
+    declare_type = DEC_ERROR;
+}
+
+SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type)
+{
+    id_name = id;
+    declare_type = dec;
+    data_type = type;
 }
 
 string SymInfo::get_id_name()
@@ -24,11 +45,21 @@ _Data_type SymInfo::get_data_type()
     return data_type;
 }
 
-
+void SymInfo::test()
+{
+    cout << "ID name: " << get_id_name() << endl;
+    cout << "Declare type: " << get_declare_type() << endl;
+    cout << "Data type: " << get_data_type() << endl;
+}
 
 /* Single Symbol Table */
 
 SymTable::SymTable()
+{
+    table.clear();
+}
+
+SymTable::~SymTable()
 {
     table.clear();
 }
@@ -62,13 +93,18 @@ void SymTable::dump()
 }
 
 
-/* Multi Symbol Tables */
+/* Multiple Symbol Tables */
 
 SymbolTables::SymbolTables()
 {
     // Add the first Global Table
     top = -1;
     this->add_table();
+}
+
+SymbolTables::~SymbolTables()
+{
+    tables.clear();
 }
 
 int SymbolTables::insert(SymInfo* entry)

@@ -139,11 +139,15 @@ while	{
 
  /* KEYWORDS & BOOLEAN CONSTANTS */
 false 	{
-		token(FALSE);
+		// True False is both bool type, no difference.
+		yylval.bval = false;
+		token(CONST_BOOL);
 		}
 
 true	{
-		token(TRUE);
+		// True False is both bool type, no difference.
+		yylval.bval = true;
+		token(CONST_BOOL);
 		}
 
  /* Add KEYWORDS read */
@@ -213,20 +217,21 @@ read	{
 
 		// insert(SymbolTable, yytext);
 		tokenString("id" , yytext);
+		yylval.sval = new string(yytext);
 		return ID;
 		}
 
  /* INTEGER CONSTANTS */
 {digit}+ {
 		tokenInteger("int", atoi(yytext));
+		yylval.ival = atoi(yytext);
 		return CONST_INT;
 		}
 
  /* REAL CONSTANTS */
 [+-]?({digit}+\.{digit}*|{digit}*\.{digit}+)([Ee][+-]?[0-9]+)? {
-		double f;
-		sscanf(yytext, "%lf", &f);
-		tokenFloat("float", f);
+		tokenFloat("float", atof(yytext));
+		yylval.fval = atof(yytext);
 		return CONST_REAL;
 		}
 
@@ -253,16 +258,21 @@ read	{
 				tokenS[j++] = temp[i];
 			}
 		}
+
 		tokenString("string", tokenS);
+		yylval.sval = tokenS;
+
 		free(tokenS);
 		free(temp);
 		return CONST_STRING;
 		}
 
  /* CHAR CONSTANTS */
-\'(\'\'|[^\'\n])\'	{
+\'([^\'\n])\'	{
 
 		tokenString("char", yytext);
+		// Not taking ''.
+		yylval.cval = yytext[1];
 		return CONST_CHAR;
 		}
 
