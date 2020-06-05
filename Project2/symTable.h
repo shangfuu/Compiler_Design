@@ -7,7 +7,6 @@
 *  and vector to do a dynamic table easily.
 */
 
-
 #include <iostream>
 #include <string>
 #include <map>
@@ -39,6 +38,43 @@ enum _Declare_type {
 };
 
 /*
+*   Reocrd Data Value and Data Type:
+*   Every declaretions, expression, function will only
+*   have an unique data type.
+*   Make it a class because things like expression
+*   will have type and value, but no id name.
+*/
+class Data
+{
+
+private:
+    union u_value
+    {
+        /* data */
+        int ival;
+        float fval;
+        char cval;
+        string *sval;
+        bool bval;
+    };
+
+    u_value value;
+    _Data_type data_type;
+    bool modified;
+
+public:
+    Data();
+
+    void set_value();
+
+    _Data_type get_data_type();
+    
+    // Used in VAL to check if modified.
+    bool isModified();
+
+};
+
+/*
 *  Symbol Table Entry Info:
 *  All the information that an Symbol
 *  may need.
@@ -50,6 +86,7 @@ private:
     string id_name;
     _Declare_type declare_type;
     _Data_type data_type;
+    Data* data;
 
 public:
     SymInfo();
@@ -61,14 +98,17 @@ public:
     _Declare_type get_declare_type();
     _Data_type get_data_type();
 
+    Data* get_value();
+    void set_value();
+
     void test();
 };
 
 
 /*
-*  Single Symbol Table:
-*  Can easily access a ID like map[ID],
-*  and get the ID attribute.
+*   Single Symbol Table:
+*   Can easily access a ID like map[ID].
+*   Manage as a local symbol table.
 */
 class SymTable 
 {

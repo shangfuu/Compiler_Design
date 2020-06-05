@@ -15,7 +15,7 @@ void yyerror(string);
 void insertTableEntry(SymInfo*);
 %}
 
-/* Used in yylval, use $ in yacc */
+/* Can be used in yylval, use in yacc $, non-terminal type */
 %union{
     int 	ival;
     float 	fval;
@@ -24,6 +24,9 @@ void insertTableEntry(SymInfo*);
 
     // pointer use *$
     string *sval;
+
+    // Non-terminal type
+    _Data_type dataType;
 }
 
 /* tokens */
@@ -57,6 +60,9 @@ void insertTableEntry(SymInfo*);
 %left '*' '/'
 %nonassoc UMINUS
 
+/* Return type of NON-TERMINAL */
+%type <dataType> type
+
 %%
 program:
                 OBJECT ID
@@ -74,9 +80,68 @@ program:
                 ;
 
 var_const_decs: 
-                var_const_dec var_const_decs |
-                var_const_dec |
-                /* zero or more */
+                var_const_dec var_const_decs
+                | var_const_dec
+                | /* zero or more */
+                ;
+
+var_const_dec:  
+                const_dec | var_dec
+                ;
+
+const_dec:
+                VAL ID ':' type '=' expression
+                {
+                }
+                | VAL ID '=' expression
+                {
+
+                }
+                ;
+
+type:
+                INT
+                {
+                    $$ = TYPE_INT;
+                }
+                | FLOAT
+                {
+                    $$ = TYPE_FLOAT;
+                }
+                | CHAR
+                {
+                    $$ = TYPE_CHAR;
+                }
+                | STRING
+                {
+                    $$ = TYPE_STRING;
+                }
+                | BOOLEAN
+                {
+                    $$ = TYPE_BOOL;
+                }
+                ;
+
+expression:
+                ;
+
+var_dec:
+                VAR ID ':' type '=' expression
+                {
+
+                }
+                | VAR ID ':' type
+                {
+
+                }
+                | VAR ID '=' expression
+                {
+
+                }
+                | VAR ID ':' type '[' CONST_INT ']'   /* Array */
+                {
+
+                }
                 ;
 
 method_decs:    
@@ -85,18 +150,8 @@ method_decs:
                 /* one or more*/
                 ;
 
-var_const_dec:  
-                variable | const
-                ;
-
 method_dec:     
 
-                ;
-
-variable:       
-                ;
-
-const:          
                 ;
 
 %%

@@ -16,5 +16,5 @@ Modified in Project2 lex:
     #define IDENTIFIER "id"
     #define INTEGER "int"
     #define STRING "string"
-
+11. True False return Token(CONST_BOOL), because they are both bool value in yacc.
 

@@ -1,5 +1,7 @@
 #include "symTable.h"
 
+
+
 /* Symbol Table Entry Info */
 
 SymInfo::SymInfo()
@@ -7,6 +9,7 @@ SymInfo::SymInfo()
     id_name = "";
     declare_type = DEC_ERROR;
     data_type = TYPE_NONE;
+    data = NULL;
 }
 
 SymInfo::SymInfo(string id, _Declare_type dec)
@@ -14,6 +17,7 @@ SymInfo::SymInfo(string id, _Declare_type dec)
     id_name = id;
     declare_type = dec;
     data_type = TYPE_NONE;
+    data = NULL;
 }
 
 SymInfo::SymInfo(string id, _Data_type type)
@@ -21,6 +25,7 @@ SymInfo::SymInfo(string id, _Data_type type)
     id_name = id;
     data_type = type;
     declare_type = DEC_ERROR;
+    data = NULL;
 }
 
 SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type)
@@ -28,6 +33,7 @@ SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type)
     id_name = id;
     declare_type = dec;
     data_type = type;
+    data = NULL;
 }
 
 string SymInfo::get_id_name()

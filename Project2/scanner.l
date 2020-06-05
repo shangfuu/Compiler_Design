@@ -260,7 +260,7 @@ read	{
 		}
 
 		tokenString("string", tokenS);
-		yylval.sval = tokenS;
+		yylval.sval = new string(tokenS);
 
 		free(tokenS);
 		free(temp);
