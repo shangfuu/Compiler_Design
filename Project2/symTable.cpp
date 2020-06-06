@@ -90,7 +90,6 @@ SymInfo::SymInfo()
 {
     id_name = "";
     declare_type = DEC_ERROR;
-    
 }
 
 SymInfo::SymInfo(string id, _Declare_type dec)
@@ -110,13 +109,6 @@ SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, Data dataValue)
     id_name = id;
     declare_type = dec;
     data = dataValue;
-
-    // Check declare type and assign type
-    if (type != dataValue.get_data_type())
-    {
-        cout << "Declare type not equal assign type" << endl;
-        exit(EXIT_FAILURE);
-    }
 }
 
 SymInfo::SymInfo(string id, _Declare_type dec, Data dataValue)

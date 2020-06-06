@@ -45,6 +45,7 @@ enum _Declare_type {
 *   Make it a class because things like expression
 *   will have type and value, but no id name and declare.
 */
+
 class Data
 {
 
@@ -69,15 +70,15 @@ private:
 public:
     Data();
 
-    // Set value in template. Set Data Type.
+    // Set value in template. Set Data Type.s
     template <typename T>
     Data(_Data_type, T);
 
     // Set only type Int, Float, Bool, Char, String to value.
-    template <typename T> 
+    template <typename T>
     void set_value(_Data_type, T);
 
-    // Get different type of value.
+    // Get different type of value.s
     template <typename T>
     T get_value();
 
@@ -106,22 +107,20 @@ private:
 
 public:
     SymInfo();
-    // Used in program
+    // Used like:  object ID.
     SymInfo(string, _Declare_type);
-
-    // Used in val and var
+    // Used like:  var ID : type
     SymInfo(string, _Declare_type, _Data_type);
+    // Used like:  var ID : type = value
     SymInfo(string, _Declare_type, _Data_type, Data);
+    // Used like:  var ID  = value
     SymInfo(string, _Declare_type, Data);
+
+
 
     string get_id_name();
     _Declare_type get_declare_type();
 
-    // Get data, then can get the value and type of data.
-    Data* get_data();
-
-    // Set the value of entry data.
-    void set_value();
 
     void test();
 };
@@ -175,4 +174,5 @@ public:
     void dump();
 };
 
-#endif
+
+#endif  

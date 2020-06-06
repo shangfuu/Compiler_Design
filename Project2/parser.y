@@ -64,7 +64,7 @@ void insertTableEntry(SymInfo*);
 
 /* Return type of NON-TERMINAL */
 %type <dataType> type
-%type <dataValue> expression
+%type <dataValue> expression literal_const
 
 %%
 program:
@@ -95,11 +95,38 @@ var_const_dec:
 const_dec:
                 VAL ID ':' type '=' expression
                 {
+                    if ($4 != $6->get_data_type()) 
+                    {
+                        yyerror("Declartion Type Inconsistent");
+                    }
                     insertTableEntry(new SymInfo(*$2, DEC_VAL, $4, *$6));
                 }
                 | VAL ID '=' expression
                 {
                     insertTableEntry(new SymInfo(*$2, DEC_VAL, *$4));
+                }
+                ;
+
+var_dec:
+                VAR ID ':' type '=' expression
+                {
+                    if ($4 != $6->get_data_type())
+                    {
+                        yyerror("Declartion Type Inconsistent");
+                    }
+                    insertTableEntry(new SymInfo(*$2, DEC_VAR, $4, *$6));
+                }
+                | VAR ID ':' type
+                {
+                    insertTableEntry(new SymInfo(*$2, DEC_VAR, $4));
+                }
+                | VAR ID '=' expression
+                {
+                    insertTableEntry(new SymInfo(*$2, DEC_VAR, *$4));
+                }
+                | VAR ID ':' type '[' CONST_INT ']'   /* Array */
+                {
+
                 }
                 ;
 
@@ -127,22 +154,26 @@ type:
                 ;
 
 expression:
+                literal_const
                 ;
 
-var_dec:
-                VAR ID ':' type '=' expression
+literal_const:
+                CONST_INT
+                {
+                }
+                | CONST_REAL
                 {
 
                 }
-                | VAR ID ':' type
+                | CONST_CHAR
                 {
 
                 }
-                | VAR ID '=' expression
+                | CONST_STRING
                 {
 
                 }
-                | VAR ID ':' type '[' CONST_INT ']'   /* Array */
+                | CONST_BOOL
                 {
 
                 }
