@@ -45,7 +45,6 @@ enum _Declare_type {
 *   Make it a class because things like expression
 *   will have type and value, but no id name and declare.
 */
-
 class Data
 {
 
@@ -69,22 +68,34 @@ private:
 
 public:
     Data();
+    /* Set value, type and modified. */
+    Data(_Data_type dtype, int iv): data_type(dtype), modified(true){ value.ival = iv; };
+    Data(_Data_type dtype, float fv): data_type(dtype), modified(true){ value.fval = fv; };
+    Data(_Data_type dtype, string *sv): data_type(dtype), modified(true){ value.sval = sv; };
+    Data(_Data_type dtype, char cv): data_type(dtype), modified(true){ value.cval = cv; };
+    Data(_Data_type dtype, bool bv): data_type(dtype), modified(true){ value.bval = bv; };
 
-    // Set value in template. Set Data Type.s
-    template <typename T>
-    Data(_Data_type, T);
+    /* Set Value function */
+    void set_value(int iv);
+    void set_value(float fv);
+    void set_value(char cv);
+    void set_value(string* sv);
+    void set_value(bool bv);
+    
+    // Set data type.
+    void set_data_type();
 
-    // Set only type Int, Float, Bool, Char, String to value.
-    template <typename T>
-    void set_value(_Data_type, T);
+    /* Get Value */
+    string* get_string();
+    int get_int();
+    float get_float();
+    char get_char();
+    bool get_bool();
 
-    // Get different type of value.s
-    template <typename T>
-    T get_value();
-
+    // Get data type
     _Data_type get_data_type();
     
-    // Used in VAL to check if modified.
+    // Check if modified.
     bool isModified();
 };
 
@@ -115,7 +126,6 @@ public:
     SymInfo(string, _Declare_type, _Data_type, Data);
     // Used like:  var ID  = value
     SymInfo(string, _Declare_type, Data);
-
 
 
     string get_id_name();

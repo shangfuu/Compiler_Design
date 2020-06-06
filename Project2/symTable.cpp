@@ -8,70 +8,17 @@ Data::Data()
     data_type = TYPE_NONE;
 }
 
-template <typename T>
-Data::Data(_Data_type dtype, T tvalue)
-{
-    modified = true;
-    set_value(dtype, tvalue);
-}
+void Data::set_value(int iv) { value.ival = iv; modified = true; }
+void Data::set_value(float fv) { value.fval = fv; modified = true; }
+void Data::set_value(char cv) { value.cval = cv; modified = true; }
+void Data::set_value(string* sv) { value.sval = sv; modified = true; }
+void Data::set_value(bool bv) { value.bval = bv; modified = true; }
 
-template <typename T>
-void Data::set_value(_Data_type dtype, T tvalue)
-{
-    data_type = dtype;
-
-    // Use typeid to make sure value type is match.
-    switch (typeid(tvalue))
-    {
-    case typeid(value.ival):
-        value.ival = tvalue;
-        break;
-    case typeid(value.fval):
-        value.fval = tvalue;
-        break;
-    case typeid(value.cval):
-        value.cval = tvalue;
-        break;
-    case typeid(value.sval):
-        value.sval = tvalue;
-        break;
-    case typeid(value.bval):
-        value.bval = tvalue;
-        break;
-    default:
-        cout << "Data initial Error" << endl;
-        exit(EXIT_FAILURE);
-        break;
-    }
-}
-
-template <typename T>
-T Data::get_value()
-{
-    switch (data_type)
-    {
-    case TYPE_INT:
-        return value.ival;
-        break;
-    case TYPE_FLOAT:
-        return value.fval;
-        break;
-    case TYPE_CHAR:
-        return value.cval;
-        break;
-    case TYPE_STRING:
-        return value.sval;
-        break;
-    case TYPE_BOOL:
-        return value.bval;
-        break;
-    default:    // TYPE_NONE
-        cout << "NOT INITIAL" << endl;
-        break;
-    }
-
-    return NULL;
-}
+int Data::get_int() { return value.ival; }
+float Data::get_float() { return value.fval; }
+char Data::get_char() { return value.cval; }
+string* Data::get_string() { return value.sval; }
+bool Data::get_bool() { return value.bval; }
 
 _Data_type Data::get_data_type()
 {

@@ -160,22 +160,28 @@ expression:
 literal_const:
                 CONST_INT
                 {
+                    Data *d = new Data(TYPE_INT, $1);
+                    $$ = d;
                 }
                 | CONST_REAL
                 {
-
+                    Data *d = new Data(TYPE_FLOAT, $1);
+                    $$ = d;
                 }
                 | CONST_CHAR
                 {
-
+                    Data *d = new Data(TYPE_CHAR, $1);
+                    $$ = d;
                 }
                 | CONST_STRING
                 {
-
+                    Data *d = new Data(TYPE_STRING, $1);
+                    $$ = d;
                 }
                 | CONST_BOOL
                 {
-
+                    Data *d = new Data(TYPE_BOOL, $1);
+                    $$ = d;
                 }
                 ;
 
