@@ -11,6 +11,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <typeinfo>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,13 +43,14 @@ enum _Declare_type {
 *   Every declaretions, expression, function will only
 *   have an unique data type.
 *   Make it a class because things like expression
-*   will have type and value, but no id name.
+*   will have type and value, but no id name and declare.
 */
 class Data
 {
 
 private:
-    union u_value
+
+    union u_data
     {
         /* data */
         int ival;
@@ -58,21 +60,33 @@ private:
         bool bval;
     };
 
-    u_value value;
+    u_data value;
     _Data_type data_type;
+
+    // If not inital, modified is false;
     bool modified;
 
 public:
     Data();
 
-    void set_value();
+    // Set value in template. Set Data Type.
+    template <typename T>
+    Data(_Data_type, T);
+
+    // Set only type Int, Float, Bool, Char, String to value.
+    template <typename T> 
+    void set_value(_Data_type, T);
+
+    // Get different type of value.
+    template <typename T>
+    T get_value();
 
     _Data_type get_data_type();
     
     // Used in VAL to check if modified.
     bool isModified();
-
 };
+
 
 /*
 *  Symbol Table Entry Info:
@@ -85,20 +99,28 @@ class SymInfo
 private:
     string id_name;
     _Declare_type declare_type;
-    _Data_type data_type;
-    Data* data;
+    Data data;
+
+    // Array
+    int array_num;
 
 public:
     SymInfo();
+    // Used in program
     SymInfo(string, _Declare_type);
-    SymInfo(string, _Data_type);
+
+    // Used in val and var
     SymInfo(string, _Declare_type, _Data_type);
+    SymInfo(string, _Declare_type, _Data_type, Data);
+    SymInfo(string, _Declare_type, Data);
 
     string get_id_name();
     _Declare_type get_declare_type();
-    _Data_type get_data_type();
 
-    Data* get_value();
+    // Get data, then can get the value and type of data.
+    Data* get_data();
+
+    // Set the value of entry data.
     void set_value();
 
     void test();

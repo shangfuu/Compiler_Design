@@ -27,6 +27,8 @@ void insertTableEntry(SymInfo*);
 
     // Non-terminal type
     _Data_type dataType;
+    Data *dataValue;
+    SymInfo *symInfo;
 }
 
 /* tokens */
@@ -62,6 +64,7 @@ void insertTableEntry(SymInfo*);
 
 /* Return type of NON-TERMINAL */
 %type <dataType> type
+%type <dataValue> expression
 
 %%
 program:
@@ -92,10 +95,11 @@ var_const_dec:
 const_dec:
                 VAL ID ':' type '=' expression
                 {
+                    insertTableEntry(new SymInfo(*$2, DEC_VAL, $4, *$6));
                 }
                 | VAL ID '=' expression
                 {
-
+                    insertTableEntry(new SymInfo(*$2, DEC_VAL, *$4));
                 }
                 ;
 

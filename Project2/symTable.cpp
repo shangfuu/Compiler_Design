@@ -1,5 +1,87 @@
 #include "symTable.h"
 
+/* Data */
+
+Data::Data()
+{
+    modified = false;
+    data_type = TYPE_NONE;
+}
+
+template <typename T>
+Data::Data(_Data_type dtype, T tvalue)
+{
+    modified = true;
+    set_value(dtype, tvalue);
+}
+
+template <typename T>
+void Data::set_value(_Data_type dtype, T tvalue)
+{
+    data_type = dtype;
+
+    // Use typeid to make sure value type is match.
+    switch (typeid(tvalue))
+    {
+    case typeid(value.ival):
+        value.ival = tvalue;
+        break;
+    case typeid(value.fval):
+        value.fval = tvalue;
+        break;
+    case typeid(value.cval):
+        value.cval = tvalue;
+        break;
+    case typeid(value.sval):
+        value.sval = tvalue;
+        break;
+    case typeid(value.bval):
+        value.bval = tvalue;
+        break;
+    default:
+        cout << "Data initial Error" << endl;
+        exit(EXIT_FAILURE);
+        break;
+    }
+}
+
+template <typename T>
+T Data::get_value()
+{
+    switch (data_type)
+    {
+    case TYPE_INT:
+        return value.ival;
+        break;
+    case TYPE_FLOAT:
+        return value.fval;
+        break;
+    case TYPE_CHAR:
+        return value.cval;
+        break;
+    case TYPE_STRING:
+        return value.sval;
+        break;
+    case TYPE_BOOL:
+        return value.bval;
+        break;
+    default:    // TYPE_NONE
+        cout << "NOT INITIAL" << endl;
+        break;
+    }
+
+    return NULL;
+}
+
+_Data_type Data::get_data_type()
+{
+    return data_type;
+}
+
+bool Data::isModified()
+{
+    return modified;
+}
 
 
 /* Symbol Table Entry Info */
@@ -8,32 +90,40 @@ SymInfo::SymInfo()
 {
     id_name = "";
     declare_type = DEC_ERROR;
-    data_type = TYPE_NONE;
-    data = NULL;
+    
 }
 
 SymInfo::SymInfo(string id, _Declare_type dec)
 {
     id_name = id;
     declare_type = dec;
-    data_type = TYPE_NONE;
-    data = NULL;
-}
-
-SymInfo::SymInfo(string id, _Data_type type)
-{
-    id_name = id;
-    data_type = type;
-    declare_type = DEC_ERROR;
-    data = NULL;
 }
 
 SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type)
 {
     id_name = id;
     declare_type = dec;
-    data_type = type;
-    data = NULL;
+}
+
+SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, Data dataValue)
+{
+    id_name = id;
+    declare_type = dec;
+    data = dataValue;
+
+    // Check declare type and assign type
+    if (type != dataValue.get_data_type())
+    {
+        cout << "Declare type not equal assign type" << endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
+SymInfo::SymInfo(string id, _Declare_type dec, Data dataValue)
+{
+    id_name = id;
+    declare_type = dec;
+    data = dataValue;
 }
 
 string SymInfo::get_id_name()
@@ -46,16 +136,10 @@ _Declare_type SymInfo::get_declare_type()
     return declare_type;
 }
 
-_Data_type SymInfo::get_data_type()
-{
-    return data_type;
-}
-
 void SymInfo::test()
 {
     cout << "ID name: " << get_id_name() << endl;
     cout << "Declare type: " << get_declare_type() << endl;
-    cout << "Data type: " << get_data_type() << endl;
 }
 
 /* Single Symbol Table */
