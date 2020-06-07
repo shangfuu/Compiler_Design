@@ -71,6 +71,8 @@ void insertTableEntry(SymInfo*);
 %type <func_arg> arg
 %type <func_args> formal_args
 
+%start program
+
 %%
 program:
                 OBJECT ID
@@ -263,14 +265,14 @@ statements:
                 ;
 
 statement:
-                simple
+                simple_statement
                 | block
                 | condition
                 | loop
                 | procedure_invocation
                 ;
 
-simple:
+simple_statement:
                 ID '=' expression
                 {
                     // Check if ID exist in symbol table.
@@ -722,26 +724,73 @@ literal_const:
 
 function_invocation:
                 ID '(' comma_separated_expression ')'
+                {
+                    Trace("Reducing to function invocation");
+                }
                 ;
 
 comma_separated_expression:
                 expression
-                | expression comma_separated_expression
+                | expression ',' comma_separated_expression
                 | /* optional */
                 ;
 
 block:
+                '{'
+                {
+                    Trace("Reducing to block");
+                    // Create a new child table
+                    symbol_tables.add_table();
+                }
+                var_const_decs one_or_more_statements '}'
+                {
+                    symbol_tables.dump();
+                    // Pop the current table.
+                    symbol_tables.pop_table();
+                }
+                ;
+
+one_or_more_statements:
+                statement statements /* one or more*/
                 ;
 
 condition:
+                IF '(' expression ')'
+                {
+                    Trace("Reducing to IF ELSE condition");
+                    if ($3->get_data_type() != TYPE_BOOL)
+                    {
+                        yyerror("IF condition must be boolean");
+                    }
+                }
+                else
+                ;
+
+else:
+                block_or_simple_statement ELSE block_or_simple_statement
+                | block_or_simple_statement     /* with out else */
+                ;
+
+block_or_simple_statement:
+                block | simple_statement
                 ;
 
 loop:
+                WHILE '(' expression ')'
+                {
+
+                }
+                block_or_simple_statement
+                | FOR '(' ID '<' '-' CONST_INT TO CONST_INT ')'
+                {
+
+                }
+                block_or_simple_statement
                 ;
 
 procedure_invocation:
+                ID | ID '(' comma_separated_expression ')'
                 ;
-
 
 
 %%
