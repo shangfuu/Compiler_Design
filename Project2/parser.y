@@ -848,7 +848,7 @@ loop:
                     }
                 }
                 block_or_simple_statement
-                | FOR '(' ID '<' '-' CONST_INT TO CONST_INT ')'
+                | FOR '(' ID LT '-' CONST_INT TO CONST_INT ')'
                 {
                     Trace("Reducing to for");
                 }
