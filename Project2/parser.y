@@ -335,17 +335,17 @@ simple_statement:
 expression:     
                 literal_const
                 {
-                    Trace("literal constants expression");
+                    Trace("Reducing to literal constants expression");
                     $$ = $1;
                 }
                 | function_invocation
                 {
-                    Trace("function invocation expression");
+                    Trace("Reducing to function invocation expression");
                     // NOT YET DONE!!!!
                 }
                 | ID
                 {
-                    Trace("ID expression");
+                    Trace("Reducing to ID expression");
                     // Check if ID exist in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
                     if (id == NULL)
@@ -357,7 +357,7 @@ expression:
                 }
                 | ID '[' expression ']'
                 {
-                    Trace("array expression");
+                    Trace("Reducing to array expression");
                     // Check if ID exist in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
                     if (id == NULL)
@@ -380,7 +380,7 @@ expression:
                 /* Arithmetic expression */
                 | '-' expression %prec UMINUS
                 {
-                    Trace("UMINUS expression");
+                    Trace("Reducing to UMINUS expression");
                     if ($2->get_data_type() == TYPE_INT)
                     {
                         $2->set_value($2->get_int() * -1);
@@ -398,7 +398,7 @@ expression:
                 }
                 | expression '*' expression
                 {
-                    Trace("exp * exp");
+                    Trace("Reducing to exp * exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -420,7 +420,7 @@ expression:
                 }
                 | expression '/' expression
                 {
-                    Trace("exp / exp");
+                    Trace("Reducing to exp / exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -442,7 +442,7 @@ expression:
                 }
                 | expression '+' expression
                 {
-                    Trace("exp + exp");
+                    Trace("Reducing to exp + exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -464,6 +464,7 @@ expression:
                 }
                 | expression '-' expression
                 {
+                    Trace("Reducing to exp - exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -485,7 +486,7 @@ expression:
                 }
                 | expression LT expression
                 {
-                    Trace("exp < exp");
+                    Trace("Reducing to exp < exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -512,7 +513,7 @@ expression:
                 }
                 | expression LE expression
                 {
-                    Trace("exp <= exp");
+                    Trace("Reducing to exp <= exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -539,7 +540,7 @@ expression:
                 }
                 | expression GT expression
                 {
-                    Trace("exp > exp");
+                    Trace("Reducing to exp > exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -566,7 +567,7 @@ expression:
                 }
                 | expression GE expression
                 {
-                    Trace("exp >= exp");
+                    Trace("Reducing to exp >= exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -593,7 +594,7 @@ expression:
                 }
                 | expression EE expression
                 {
-                    Trace("exp == exp");
+                    Trace("Reducing to exp == exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -620,7 +621,7 @@ expression:
                 }
                 | expression NE expression
                 {
-                    Trace("exp != exp");
+                    Trace("Reducing to exp != exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -647,7 +648,7 @@ expression:
                 }
                 | NOT expression
                 {
-                    Trace("! exp");
+                    Trace("Reducing to ! exp");
                     if ($2->get_data_type() == TYPE_BOOL)
                     {
                         $2->set_value(!$2->get_bool());
@@ -660,7 +661,7 @@ expression:
                 }
                 | expression AND expression
                 {
-                    Trace("exp && exp");
+                    Trace("Reducing to exp && exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -677,7 +678,7 @@ expression:
                 }
                 | expression OR expression
                 {
-                    Trace("exp || exp");
+                    Trace("Reducing to exp || exp");
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -778,18 +779,41 @@ block_or_simple_statement:
 loop:
                 WHILE '(' expression ')'
                 {
-
+                    Trace("Reducing to while");
+                    if ($3->get_data_type() != TYPE_BOOL)
+                    {
+                        yyerror("WHILE expression must be boolean");
+                    }
                 }
                 block_or_simple_statement
                 | FOR '(' ID '<' '-' CONST_INT TO CONST_INT ')'
                 {
-
+                    Trace("Reducing to for");
                 }
                 block_or_simple_statement
                 ;
 
 procedure_invocation:
-                ID | ID '(' comma_separated_expression ')'
+                ID
+                {
+                    Trace("Reducing to procedure invocation");
+                    // Check if ID procedure is in symbol table.
+                    SymInfo* id = symbol_tables.look_up(*$1);
+                    if (id == NULL)
+                    {
+                        yyerror(string("ID " + *$1 +" Not FOUND"));
+                    }
+                }
+                | ID '(' comma_separated_expression ')'
+                {
+                     Trace("Reducing to procedure invocation");
+                    // Check if ID procedure is in symbol table.
+                    SymInfo* id = symbol_tables.look_up(*$1);
+                    if (id == NULL)
+                    {
+                        yyerror(string("ID " + *$1 +" Not FOUND"));
+                    }
+                }
                 ;
 
 
