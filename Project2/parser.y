@@ -387,6 +387,7 @@ expression:
                 | '-' expression %prec UMINUS
                 {
                     Trace("Reducing to UMINUS expression");
+                    // Only calculate the type INT and FLOAT
                     if ($2->get_data_type() == TYPE_INT)
                     {
                         $2->set_value($2->get_int() * -1);
@@ -405,6 +406,7 @@ expression:
                 | expression '*' expression
                 {
                     Trace("Reducing to exp * exp");
+                    // Only calculate the type INT and FLOAT
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -427,6 +429,7 @@ expression:
                 | expression '/' expression
                 {
                     Trace("Reducing to exp / exp");
+                    // Only calculate the type INT and FLOAT
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -449,6 +452,7 @@ expression:
                 | expression '+' expression
                 {
                     Trace("Reducing to exp + exp");
+                    // Only calculate the type INT and FLOAT
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -471,6 +475,7 @@ expression:
                 | expression '-' expression
                 {
                     Trace("Reducing to exp - exp");
+                    // Only calculate the type INT and FLOAT
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -493,6 +498,7 @@ expression:
                 | expression LT expression
                 {
                     Trace("Reducing to exp < exp");
+                    // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -516,11 +522,13 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp < exp");
                     }
+                    // Return BOOLEAN type
                     $$->set_data_type(TYPE_BOOL);
                 }
                 | expression LE expression
                 {
                     Trace("Reducing to exp <= exp");
+                    // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -544,11 +552,13 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp <= exp");
                     }
+                    // Return BOOLEAN type
                     $$->set_data_type(TYPE_BOOL);
                 }
                 | expression GT expression
                 {
                     Trace("Reducing to exp > exp");
+                    // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -572,11 +582,13 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp > exp");
                     }
+                    // Return BOOLEAN type
                     $$->set_data_type(TYPE_BOOL);
                 }
                 | expression GE expression
                 {
                     Trace("Reducing to exp >= exp");
+                    // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -600,11 +612,13 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp >= exp");
                     }
+                    // Return BOOLEAN type
                     $$->set_data_type(TYPE_BOOL);
                 }
                 | expression EE expression
                 {
                     Trace("Reducing to exp == exp");
+                    // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -628,11 +642,13 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp == exp");
                     }
+                    // Return BOOLEAN type
                     $$->set_data_type(TYPE_BOOL);
                 }
                 | expression NE expression
                 {
                     Trace("Reducing to exp != exp");
+                    // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -656,11 +672,13 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp != exp");
                     }
+                    // Return BOOLEAN type
                     $$->set_data_type(TYPE_BOOL);
                 }
                 | NOT expression
                 {
                     Trace("Reducing to ! exp");
+                    // Only calculate the type BOOL
                     if ($2->get_data_type() == TYPE_BOOL)
                     {
                         $2->set_value(!$2->get_bool());
@@ -674,6 +692,7 @@ expression:
                 | expression AND expression
                 {
                     Trace("Reducing to exp && exp");
+                    // Only calculate the type BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
@@ -691,6 +710,7 @@ expression:
                 | expression OR expression
                 {
                     Trace("Reducing to exp || exp");
+                    // Only calculate the type BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
