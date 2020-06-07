@@ -126,7 +126,7 @@ var_dec:
                 }
                 | VAR ID ':' type '[' CONST_INT ']'   /* Array */
                 {
-
+                    insertTableEntry(new SymInfo(*$2, DEC_ARRAY, $4, $6));
                 }
                 ;
 

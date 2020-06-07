@@ -83,7 +83,7 @@ public:
     void set_value(bool bv);
     
     // Set data type.
-    void set_data_type();
+    void set_data_type(_Data_type);
 
     /* Get Value */
     string* get_string();
@@ -111,10 +111,15 @@ class SymInfo
 private:
     string id_name;
     _Declare_type declare_type;
-    Data data;
+    // Store data value and data type.
+    Data var_data;
 
-    // Array
+    /* Array */
+    // Array stoage length
     int array_num;
+    // Store array data and data type.
+    vector<Data>array_data;
+
 
 public:
     SymInfo();
@@ -127,6 +132,11 @@ public:
     // Used like:  var ID  = value
     SymInfo(string, _Declare_type, Data);
 
+    /* Array */
+    // Used like:  var ID : type [num]
+    SymInfo(string, _Declare_type, _Data_type, int);
+
+    /* Function */
 
     string get_id_name();
     _Declare_type get_declare_type();

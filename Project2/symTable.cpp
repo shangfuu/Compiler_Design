@@ -20,6 +20,11 @@ char Data::get_char() { return value.cval; }
 string* Data::get_string() { return value.sval; }
 bool Data::get_bool() { return value.bval; }
 
+void Data::set_data_type(_Data_type dtype) 
+{
+    data_type = dtype;
+}
+
 _Data_type Data::get_data_type()
 {
     return data_type;
@@ -38,6 +43,7 @@ SymInfo::SymInfo()
     id_name = "";
     declare_type = DEC_ERROR;
 }
+// Variable
 
 SymInfo::SymInfo(string id, _Declare_type dec)
 {
@@ -55,15 +61,30 @@ SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, Data dataValue)
 {
     id_name = id;
     declare_type = dec;
-    data = dataValue;
+    var_data = dataValue;
 }
 
 SymInfo::SymInfo(string id, _Declare_type dec, Data dataValue)
 {
     id_name = id;
     declare_type = dec;
-    data = dataValue;
+    var_data = dataValue;
 }
+// Array
+
+SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, int length)
+{
+    id_name = id;
+    declare_type = dec;
+    array_num = length;
+    for(int i = 0 ; i < length; i++)
+    {
+        Data temp_d;
+        temp_d.set_data_type(type);
+        array_data.push_back(temp_d);
+    }
+}
+
 
 string SymInfo::get_id_name()
 {
