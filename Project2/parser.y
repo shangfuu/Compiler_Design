@@ -174,7 +174,7 @@ method_decs:
 method_dec:     
                 DEF ID '(' formal_args ')' return_type
                 {
-                    Trace("Reducing method declartion");
+                    Trace("Reducing to method declartion");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
                     // Add function arg type. use to check.
@@ -204,7 +204,7 @@ method_dec:
                 /* Parentheses are not required when no arguments are declared */
                 | DEF ID return_type
                 {
-                    Trace("Reducing method declartion");
+                    Trace("Reducing to method declartion");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
                     func->set_return_type($3);
@@ -883,4 +883,6 @@ main(int argc, char* argv[])
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
+    
+    cout << "Parsing succedd!" << endl;
 }
