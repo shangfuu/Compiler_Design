@@ -84,7 +84,14 @@ SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, int length)
         array_data.push_back(temp_d);
     }
 }
+// Function
 
+SymInfo::SymInfo(string id, _Data_type type)
+{
+    id_name = id;
+    declare_type = DEC_ERROR;
+    var_data.set_data_type(type);
+}
 
 string SymInfo::get_id_name()
 {

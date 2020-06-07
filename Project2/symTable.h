@@ -137,6 +137,9 @@ public:
     SymInfo(string, _Declare_type, _Data_type, int);
 
     /* Function */
+    // Used in function arguments.
+    SymInfo(string, _Data_type);
+
 
     string get_id_name();
     _Declare_type get_declare_type();

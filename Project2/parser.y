@@ -28,7 +28,10 @@ void insertTableEntry(SymInfo*);
     // Non-terminal type
     _Data_type dataType;
     Data *dataValue;
-    SymInfo *symInfo;
+
+    SymInfo *func_arg;
+    vector<SymInfo*>* func_args;
+
 }
 
 /* tokens */
@@ -63,8 +66,10 @@ void insertTableEntry(SymInfo*);
 %nonassoc UMINUS
 
 /* Return type of NON-TERMINAL */
-%type <dataType> type
+%type <dataType> type return_type
 %type <dataValue> expression literal_const
+%type <func_arg> arg
+%type <func_args> formal_args
 
 %%
 program:
@@ -84,7 +89,6 @@ program:
 
 var_const_decs: 
                 var_const_dec var_const_decs
-                | var_const_dec
                 | /* zero or more */
                 ;
 
@@ -126,6 +130,10 @@ var_dec:
                 }
                 | VAR ID ':' type '[' CONST_INT ']'   /* Array */
                 {
+                    if ($6 < 1)
+                    {
+                        yyerror("Array length must greater than 1");
+                    }
                     insertTableEntry(new SymInfo(*$2, DEC_ARRAY, $4, $6));
                 }
                 ;
@@ -186,14 +194,66 @@ literal_const:
                 ;
 
 method_decs:    
-                method_dec method_decs |
-                method_dec
+                method_dec method_decs
+                | method_dec
                 /* one or more*/
                 ;
 
 method_dec:     
+                DEF ID '(' formal_args ')' return_type
+                {
 
+                }
+                '{' var_const_decs statements '}'
+                {
+
+                }
+                /* Parentheses are not required when no arguments are declared */
+                | DEF ID return_type
+                {
+
+                }
+                '{' var_const_decs statements '}'
+                {
+
+                }
                 ;
+
+return_type:    
+                ':' type
+                {
+                    $$ = $2;
+                }
+                | /* No return type */
+                {
+                    $$ = TYPE_NONE;
+                }
+                ;
+
+// May have some Error.
+formal_args:    
+                arg ',' formal_args
+                {
+                    $3->push_back($1);
+                    $$ = $3;
+                }
+                | /* zero or more */
+                {
+                    $$ = new vector<SymInfo*>();
+                }
+                ;
+
+arg:            
+                ID ':' type
+                {
+                    // Set Declare type later.
+                    $$ = new SymInfo(*$1, $3);
+                }
+                ;
+
+statements:     /* zero or more */
+                ;
+
 
 %%
 
