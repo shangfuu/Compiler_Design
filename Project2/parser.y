@@ -276,6 +276,7 @@ statement:
 simple_statement:
                 ID '=' expression
                 {
+                    Trace("Reducing to simple statement");
                     // Check if ID exist in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
                     if (id == NULL)
@@ -297,6 +298,7 @@ simple_statement:
                 }
                 | ID '[' expression ']' '=' expression
                 {
+                    Trace("Reducing to simple statement");
                     // Check if ID exist in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
                     if (id == NULL)
@@ -351,6 +353,7 @@ expression:
                     Trace("Reducing to ID expression");
                     // Check if ID exist in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
+                    
                     if (id == NULL)
                     {
                         yyerror(string("ID " + *$1 +" Not FOUND"));
@@ -513,6 +516,7 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp < exp");
                     }
+                    $$->set_data_type(TYPE_BOOL);
                 }
                 | expression LE expression
                 {
@@ -540,6 +544,7 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp <= exp");
                     }
+                    $$->set_data_type(TYPE_BOOL);
                 }
                 | expression GT expression
                 {
@@ -567,6 +572,7 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp > exp");
                     }
+                    $$->set_data_type(TYPE_BOOL);
                 }
                 | expression GE expression
                 {
@@ -594,6 +600,7 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp >= exp");
                     }
+                    $$->set_data_type(TYPE_BOOL);
                 }
                 | expression EE expression
                 {
@@ -621,6 +628,7 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp == exp");
                     }
+                    $$->set_data_type(TYPE_BOOL);
                 }
                 | expression NE expression
                 {
@@ -648,6 +656,7 @@ expression:
                     {
                         yyerror("TYPE ERROR in exp != exp");
                     }
+                    $$->set_data_type(TYPE_BOOL);
                 }
                 | NOT expression
                 {
@@ -883,6 +892,6 @@ main(int argc, char* argv[])
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
-    
-    cout << "Parsing succedd!" << endl;
+    else
+        cout << "Parsing succedd!" << endl;
 }

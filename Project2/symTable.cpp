@@ -266,7 +266,7 @@ SymInfo* SymbolTables::look_up(string id_name)
 {
     SymInfo* lookup_entry;
 
-    for(int i = top; i >= 0; i++)
+    for(int i = top; i >= 0; i--)
     {
         lookup_entry = tables[i].lookup(id_name);
         if (lookup_entry != NULL)
@@ -279,9 +279,10 @@ SymInfo* SymbolTables::look_up(string id_name)
 
 void SymbolTables::dump()
 {
-    for(int i = 0; i < top; i++)
+    for(int i = 0; i <= top; i++)
     {
-        cout << "Table" << i << endl;
+        cout << "===== Table " << i << " =====" << endl;
         tables[i].dump();
+        cout << "===================" << endl;
     }
 }
