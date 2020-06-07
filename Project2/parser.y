@@ -178,7 +178,6 @@ method_dec:
                     {
                         func->add_arg_type((*$4)[i]->get_data_type());
                     }
-                    // Set function return type
                     func->set_return_type($6);
 
                     // Add func into current table.
@@ -204,7 +203,6 @@ method_dec:
                     Trace("Reducing method declartion");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
-                    // Set function return type.
                     func->set_return_type($3);
                     // Add func into current table.
                     insertTableEntry(func);
@@ -234,10 +232,14 @@ return_type:
 formal_args:    
                 arg
                 {
-
+                    // Create a vector which store only one arg.
+                    vector<SymInfo*>* temp = new vector<SymInfo*>();
+                    temp->push_back($1);
+                    $$ = temp;
                 }
                 | arg ',' formal_args
                 {
+                    // Store arg into formal_args
                     $3->push_back($1);
                     $$ = $3;
                 }
@@ -255,11 +257,187 @@ arg:
                 }
                 ;
 
-statements:     /* zero or more */
+statements:     
+                statement statements
+                | /* zero or more */
                 ;
 
-expression:
+statement:
+                simple
+                | block
+                | condition
+                | loop
+                | procedure_invocation
+                ;
+
+simple:
+                ID '=' expression
+                {
+                    // Check if ID exist in symbol table.
+                    SymInfo* id = symbol_tables.look_up(*$1);
+                    if (id == NULL)
+                    {
+                        yyerror(string("ID " + *$1 +" Not FOUND"));
+                    }
+                    // Declare must be DEC_VAR
+                    if (id->get_declare_type() != DEC_VAR)
+                    {
+                        yyerror(string("ID " + *$1 + " VAL can't be assign"));
+                    }   
+                    // Only assign with same data type
+                    if (id->get_data_type() != $3->get_data_type())
+                    {
+                        yyerror(string("ID " + *$1 + " Assign with different Data type"));
+                    }
+                    // Set variable data
+                    id->set_data(*$3);
+                }
+                | ID '[' expression ']' '=' expression
+                {
+                    // Check if ID exist in symbol table.
+                    SymInfo* id = symbol_tables.look_up(*$1);
+                    if (id == NULL)
+                    {
+                        yyerror(string("ID " + *$1 +" Not FOUND"));
+                    }
+                    // Index must be int
+                    if ($3->get_data_type() != TYPE_INT)
+                    {
+                        yyerror(string("ID " + *$1 + " array index must be int"));
+                    }
+                    // Declare type must be DEC_ARRAY;
+                    if (id->get_declare_type() != DEC_ARRAY)
+                    {
+                        yyerror(string("ID " + *$1 + " not array type"));
+                    }
+                    // Only assign with same data type
+                    if (id->get_array_data_type() != $6->get_data_type())
+                    {
+                        yyerror(string("ID " + *$1 + " Assign with different Data type"));
+                    }
+                    // Check if index out of range
+                    if (id->get_array_length() <= $3->get_int())
+                    {
+                        yyerror(string("ID " + *$1 + " array index out of range"));
+                    }
+                    // Set array[index] data.
+                    id->set_array_data($3->get_int(), *$6);
+                }
+                | PRINT '(' expression ')'
+                | PRINTLN '(' expression ')'
+                | READ ID
+                | RETURN expression
+                | RETURN
+                ;
+
+expression:     
                 literal_const
+                {
+                    Trace("literal constants expression");
+                    $$ = $1;
+                }
+                | function_invocation
+                {
+                    Trace("function invocation expression");
+                    // NOT YET DONE!!!!
+                }
+                | ID
+                {
+                    Trace("ID expression");
+                    // Check if ID exist in symbol table.
+                    SymInfo* id = symbol_tables.look_up(*$1);
+                    if (id == NULL)
+                    {
+                        yyerror(string("ID " + *$1 +" Not FOUND"));
+                    }
+                    // Return ID data.
+                    $$ = id->get_data();
+                }
+                | ID '[' expression ']'
+                {
+                    Trace("array expression");
+                    // Check if ID exist in symbol table.
+                    SymInfo* id = symbol_tables.look_up(*$1);
+                    if (id == NULL)
+                        yyerror(string("ID " + *$1 +" Not FOUND"));
+                    // Check if index out of range
+                    if (id->get_array_length() <= $3->get_int())
+                        yyerror(string("ID " + *$1 + " array index out of range"));
+                    // Declare type must be DEC_ARRAY;
+                    if (id->get_declare_type() != DEC_ARRAY)
+                        yyerror(string("ID " + *$1 + " not array type"));
+                    // Return ID[index] data.
+                    $$ = id->get_array_data($3->get_int());
+                }
+                /* Arithmetic expression */
+                | '-' expression %prec UMINUS
+                {
+                    Trace("UMINUS expression");
+                    if ($2->get_data_type() == TYPE_INT)
+                    {
+                        $$ = $2->get_int() * -1;
+                    }
+                    else if ($2->get_data_type() == TYPE_FLOAT)
+                    {
+                        $$ = $2->get_float() * -1;
+                    }
+                    else 
+                    {
+                        yyerror(string("Invalid type in UMINUS expression"));
+                    }
+                }
+                | expression '*' expression
+                {
+                    Trace("exp * exp");
+                }
+                | expression '/' expression
+                {
+                    Trace("exp / exp");
+                }
+                | expression '+' expression
+                {
+                    Trace("exp + exp");
+                }
+                | expression '-' expression
+                {
+                    Trace("exp - exp");
+                }
+                | expression LT expression
+                {
+                    Trace("exp * exp");
+                }
+                | expression LE expression
+                {
+                    Trace("exp * exp");
+                }
+                | expression GT expression
+                {
+                    Trace("exp * exp");
+                }
+                | expression GE expression
+                {
+                    Trace("exp * exp");
+                }
+                | expression EE expression
+                {
+                    Trace("exp * exp");
+                }
+                | expression NE expression
+                {
+                    Trace("exp * exp");
+                }
+                | NOT expression
+                {
+                    Trace("exp * exp");
+                }
+                | expression AND expression
+                {
+                    Trace("exp * exp");
+                }
+                | expression OR expression
+                {
+                    Trace("exp * exp");
+                }
                 ;
 
 literal_const:
@@ -289,6 +467,30 @@ literal_const:
                     $$ = d;
                 }
                 ;
+
+function_invocation:
+                ID '(' comma_separated_expression ')'
+                ;
+
+comma_separated_expression:
+                expression
+                | expression comma_separated_expression
+                | /* optional */
+                ;
+
+block:
+                ;
+
+condition:
+                ;
+
+loop:
+                ;
+
+procedure_invocation:
+                ;
+
+
 
 %%
 

@@ -69,11 +69,11 @@ private:
 public:
     Data();
     /* Set value, type and modified. */
-    Data(_Data_type dtype, int iv): data_type(dtype), modified(true){ value.ival = iv; };
-    Data(_Data_type dtype, float fv): data_type(dtype), modified(true){ value.fval = fv; };
-    Data(_Data_type dtype, string *sv): data_type(dtype), modified(true){ value.sval = sv; };
-    Data(_Data_type dtype, char cv): data_type(dtype), modified(true){ value.cval = cv; };
-    Data(_Data_type dtype, bool bv): data_type(dtype), modified(true){ value.bval = bv; };
+    Data(_Data_type dtype, int iv);
+    Data(_Data_type dtype, float fv);
+    Data(_Data_type dtype, string *sv);
+    Data(_Data_type dtype, char cv);
+    Data(_Data_type dtype, bool bv);
 
     /* Set Value function */
     void set_value(int iv);
@@ -119,7 +119,7 @@ private:
     // Array stoage length
     int array_num;
     // Store array data and data type.
-    vector<Data>array_data;
+    Data *array_data;
 
     /* Function */
     _Data_type return_type;
@@ -140,7 +140,8 @@ public:
     /* Array */
     // Used like:  var ID : type [num]
     SymInfo(string, _Declare_type, _Data_type, int);
-    _Data_type get_array_type();
+    _Data_type get_array_data_type();
+    int get_array_length();
 
     /* Function */
     void add_arg_type(_Data_type);
@@ -151,6 +152,14 @@ public:
     string get_id_name();
     _Declare_type get_declare_type();
     _Data_type get_data_type();
+
+    // Set data.
+    void set_data(Data);
+    void set_array_data(int, Data);
+
+    // Get data
+    Data *get_data();
+    Data *get_array_data(int);
 
 
     void test();
@@ -171,7 +180,7 @@ private:
 public:
     SymTable();
     ~SymTable();
-    // Lookup entries in the table
+    // Lookup entries in the table. Return NULL if not found.
     SymInfo* lookup(string);
     // Insert the entry, return 1: success, -1: failed
     int insert(SymInfo*);
@@ -199,8 +208,8 @@ public:
     void pop_table();
     // Insert the entry at the top table, return 1: success, -1: failed
     int insert(SymInfo*);
-    // Lookup all table Entries
-    SymInfo* look_up(SymInfo*);
+    // Lookup all table Entries. Return if not found.
+    SymInfo* look_up(string);
     // Dump all tables and their entry
     void dump();
 };

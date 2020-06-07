@@ -7,13 +7,21 @@ Data::Data()
     modified = false;
     data_type = TYPE_NONE;
 }
+// Constructor
+Data::Data(_Data_type dtype, int iv) { value.ival = iv; data_type = dtype; modified = true; }
+Data::Data(_Data_type dtype, float fv) { value.fval = fv; data_type = dtype; modified = true; }
+Data::Data(_Data_type dtype, string *sv) { value.sval = sv; data_type = dtype; modified = true; }
+Data::Data(_Data_type dtype, char cv) { value.cval = cv; data_type = dtype; modified = true; }
+Data::Data(_Data_type dtype, bool bv) { value.bval = bv; data_type = dtype; modified = true; }
 
+// Set value
 void Data::set_value(int iv) { value.ival = iv; modified = true; }
 void Data::set_value(float fv) { value.fval = fv; modified = true; }
 void Data::set_value(char cv) { value.cval = cv; modified = true; }
 void Data::set_value(string* sv) { value.sval = sv; modified = true; }
 void Data::set_value(bool bv) { value.bval = bv; modified = true; }
 
+// Get value
 int Data::get_int() { return value.ival; }
 float Data::get_float() { return value.fval; }
 char Data::get_char() { return value.cval; }
@@ -87,19 +95,24 @@ SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, int length)
     id_name = id;
     declare_type = dec;
     array_num = length;
-    for(int i = 0 ; i < length; i++)
+
+    array_data = new Data[length];
+    for (int i = 0 ; i < length; i++)
     {
-        Data temp_d;
-        temp_d.set_data_type(type);
-        array_data.push_back(temp_d);
+        array_data[i].set_data_type(type);
     }
     // func
     return_type = TYPE_NONE;
 }
 
-_Data_type SymInfo::get_array_type()
+_Data_type SymInfo::get_array_data_type()
 {
     return array_data[0].get_data_type();
+}
+
+int SymInfo::get_array_length()
+{
+    return array_num;
 }
 
 // Function
@@ -112,6 +125,7 @@ void SymInfo::set_return_type(_Data_type type)
 {
     return_type = type;
 }
+// Common
 
 string SymInfo::get_id_name()
 {
@@ -126,6 +140,26 @@ _Declare_type SymInfo::get_declare_type()
 _Data_type SymInfo::get_data_type()
 {
     return var_data.get_data_type();
+}
+
+void SymInfo::set_data(Data d)
+{
+    var_data = d;
+}
+
+void SymInfo::set_array_data(int index, Data d)
+{
+    array_data[index] = d;
+}
+
+Data* SymInfo::get_data()
+{
+    return &var_data;
+}
+
+Data* SymInfo::get_array_data(int index)
+{
+    return &array_data[index];
 }
 
 void SymInfo::test()
@@ -206,9 +240,8 @@ void SymbolTables::pop_table()
     top--;
 }
 
-SymInfo* SymbolTables::look_up(SymInfo* entry)
+SymInfo* SymbolTables::look_up(string id_name)
 {
-    string id_name = entry->get_id_name();
     SymInfo* lookup_entry;
 
     for(int i = top; i >= 0; i++)
