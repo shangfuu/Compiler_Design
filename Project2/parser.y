@@ -81,7 +81,7 @@ program:
                 }
                 '{' var_const_decs method_decs '}'
                 {
-                    Trace("Reducing var const or methd decs");
+                    symbol_tables.dump();
                     // End block then pop current table.
                     symbol_tables.pop_table();
                 }
@@ -161,6 +161,103 @@ type:
                 }
                 ;
 
+method_decs:    
+                method_dec method_decs
+                | method_dec
+                /* one or more*/
+                ;
+
+method_dec:     
+                DEF ID '(' formal_args ')' return_type
+                {
+                    Trace("Reducing method declartion");
+                    // New a function type STEI.
+                    SymInfo* func = new SymInfo(*$2, DEC_DEF);
+                    // Add function arg type. use to check.
+                    for(int i = 0 ; i < $4->size(); i++)
+                    {
+                        func->add_arg_type((*$4)[i]->get_data_type());
+                    }
+                    // Set function return type
+                    func->set_return_type($6);
+
+                    // Add func into current table.
+                    insertTableEntry(func);
+
+                    /* Create a new child table. */
+                    symbol_tables.add_table();
+                    // Add func ags into new table.
+                    for (int i = 0 ; i < $4->size(); i++)
+                    {
+                        insertTableEntry((*$4)[i]);
+                    }
+                }
+                '{' var_const_decs statements '}'
+                {
+                    symbol_tables.dump();
+                    // End block then pop current table.
+                    symbol_tables.pop_table();
+                }
+                /* Parentheses are not required when no arguments are declared */
+                | DEF ID return_type
+                {
+                    Trace("Reducing method declartion");
+                    // New a function type STEI.
+                    SymInfo* func = new SymInfo(*$2, DEC_DEF);
+                    // Set function return type.
+                    func->set_return_type($3);
+                    // Add func into current table.
+                    insertTableEntry(func);
+
+                    /* Create a new child table. */
+                    symbol_tables.add_table();
+                }
+                '{' var_const_decs statements '}'
+                {
+                    symbol_tables.dump();
+                    // End block then pop current table.
+                    symbol_tables.pop_table();
+                }
+                ;
+
+return_type:    
+                ':' type
+                {
+                    $$ = $2;
+                }
+                | /* No return type */
+                {
+                    $$ = TYPE_NONE;
+                }
+                ;
+
+formal_args:    
+                arg
+                {
+
+                }
+                | arg ',' formal_args
+                {
+                    $3->push_back($1);
+                    $$ = $3;
+                }
+                | /* zero or more */
+                {
+                    $$ = new vector<SymInfo*>();
+                }
+                ;
+
+arg:            
+                ID ':' type
+                {
+                    // Method args are all immutable
+                    $$ = new SymInfo(*$1, DEC_VAL, $3);
+                }
+                ;
+
+statements:     /* zero or more */
+                ;
+
 expression:
                 literal_const
                 ;
@@ -192,68 +289,6 @@ literal_const:
                     $$ = d;
                 }
                 ;
-
-method_decs:    
-                method_dec method_decs
-                | method_dec
-                /* one or more*/
-                ;
-
-method_dec:     
-                DEF ID '(' formal_args ')' return_type
-                {
-
-                }
-                '{' var_const_decs statements '}'
-                {
-
-                }
-                /* Parentheses are not required when no arguments are declared */
-                | DEF ID return_type
-                {
-
-                }
-                '{' var_const_decs statements '}'
-                {
-
-                }
-                ;
-
-return_type:    
-                ':' type
-                {
-                    $$ = $2;
-                }
-                | /* No return type */
-                {
-                    $$ = TYPE_NONE;
-                }
-                ;
-
-// May have some Error.
-formal_args:    
-                arg ',' formal_args
-                {
-                    $3->push_back($1);
-                    $$ = $3;
-                }
-                | /* zero or more */
-                {
-                    $$ = new vector<SymInfo*>();
-                }
-                ;
-
-arg:            
-                ID ':' type
-                {
-                    // Set Declare type later.
-                    $$ = new SymInfo(*$1, $3);
-                }
-                ;
-
-statements:     /* zero or more */
-                ;
-
 
 %%
 

@@ -20,22 +20,22 @@ using namespace std;
 
 // Data Type
 enum _Data_type {
+    TYPE_NONE,
     TYPE_CHAR,
     TYPE_STRING,
     TYPE_INT,
     TYPE_BOOL,
     TYPE_FLOAT,
-    TYPE_NONE,
 };
 
 // ID Declaration
 enum _Declare_type {
+    DEC_ERROR,
     DEC_VAL,
     DEC_VAR,
     DEC_ARRAY,
     DEC_OBJECT,
     DEC_DEF,
-    DEC_ERROR,
 };
 
 /*
@@ -101,9 +101,10 @@ public:
 
 
 /*
-*  Symbol Table Entry Info:
+*  Symbol Table Entry Info (STEI):
 *  All the information that an Symbol
 *  may need.
+*  Involves Variable, Array and Function type.
 */
 class SymInfo
 {
@@ -120,12 +121,16 @@ private:
     // Store array data and data type.
     vector<Data>array_data;
 
+    /* Function */
+    _Data_type return_type;
+    // Store args types, use to check function call.
+    vector<_Data_type> args_types;
 
 public:
     SymInfo();
-    // Used like:  object ID.
+    // Used like:  object ID, def ID
     SymInfo(string, _Declare_type);
-    // Used like:  var ID : type
+    // Used like:  var ID : type, function args
     SymInfo(string, _Declare_type, _Data_type);
     // Used like:  var ID : type = value
     SymInfo(string, _Declare_type, _Data_type, Data);
@@ -135,14 +140,17 @@ public:
     /* Array */
     // Used like:  var ID : type [num]
     SymInfo(string, _Declare_type, _Data_type, int);
+    _Data_type get_array_type();
 
     /* Function */
-    // Used in function arguments.
-    SymInfo(string, _Data_type);
+    void add_arg_type(_Data_type);
+    void set_return_type(_Data_type);
 
 
+    /* Common Function */
     string get_id_name();
     _Declare_type get_declare_type();
+    _Data_type get_data_type();
 
 
     void test();

@@ -42,6 +42,7 @@ SymInfo::SymInfo()
 {
     id_name = "";
     declare_type = DEC_ERROR;
+    return_type = TYPE_NONE;
 }
 // Variable
 
@@ -49,12 +50,17 @@ SymInfo::SymInfo(string id, _Declare_type dec)
 {
     id_name = id;
     declare_type = dec;
+    // func
+    return_type = TYPE_NONE;
 }
 
 SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type)
 {
     id_name = id;
     declare_type = dec;
+    var_data.set_data_type(type);
+    // func
+    return_type = TYPE_NONE;
 }
 
 SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, Data dataValue)
@@ -62,6 +68,8 @@ SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, Data dataValue)
     id_name = id;
     declare_type = dec;
     var_data = dataValue;
+    // func
+    return_type = TYPE_NONE;
 }
 
 SymInfo::SymInfo(string id, _Declare_type dec, Data dataValue)
@@ -69,6 +77,8 @@ SymInfo::SymInfo(string id, _Declare_type dec, Data dataValue)
     id_name = id;
     declare_type = dec;
     var_data = dataValue;
+    // func
+    return_type = TYPE_NONE;
 }
 // Array
 
@@ -83,14 +93,24 @@ SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, int length)
         temp_d.set_data_type(type);
         array_data.push_back(temp_d);
     }
+    // func
+    return_type = TYPE_NONE;
 }
-// Function
 
-SymInfo::SymInfo(string id, _Data_type type)
+_Data_type SymInfo::get_array_type()
 {
-    id_name = id;
-    declare_type = DEC_ERROR;
-    var_data.set_data_type(type);
+    return array_data[0].get_data_type();
+}
+
+// Function
+void SymInfo::add_arg_type(_Data_type type)
+{
+    args_types.push_back(type);
+}
+
+void SymInfo::set_return_type(_Data_type type)
+{
+    return_type = type;
 }
 
 string SymInfo::get_id_name()
@@ -101,6 +121,11 @@ string SymInfo::get_id_name()
 _Declare_type SymInfo::get_declare_type()
 {
     return declare_type;
+}
+
+_Data_type SymInfo::get_data_type()
+{
+    return var_data.get_data_type();
 }
 
 void SymInfo::test()
