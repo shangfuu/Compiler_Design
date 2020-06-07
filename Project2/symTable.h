@@ -146,7 +146,8 @@ public:
     /* Function */
     void add_arg_type(_Data_type);
     void set_return_type(_Data_type);
-
+    bool check_arg_match(vector<Data*>*);
+    _Data_type get_return_type();
 
     /* Common Function */
     string get_id_name();

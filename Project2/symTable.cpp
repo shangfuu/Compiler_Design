@@ -125,6 +125,28 @@ void SymInfo::set_return_type(_Data_type type)
 {
     return_type = type;
 }
+
+bool SymInfo::check_arg_match(vector<Data*>* func_call)
+{
+    if (func_call->size() != args_types.size())
+    {
+        return false;
+    }
+    // Check if every type is match
+    for (int i = 0 ; i < func_call->size(); i++)
+    {   
+        if ((*func_call)[i]->get_data_type() != args_types[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+_Data_type SymInfo::get_return_type()
+{
+    return return_type;
+}
 // Common
 
 string SymInfo::get_id_name()

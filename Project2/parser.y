@@ -31,6 +31,7 @@ void insertTableEntry(SymInfo*);
 
     SymInfo *func_arg;
     vector<SymInfo*>* func_args;
+    vector<Data*>* func_call;
 
 }
 
@@ -66,10 +67,11 @@ void insertTableEntry(SymInfo*);
 %nonassoc UMINUS
 
 /* Return type of NON-TERMINAL */
-%type <dataType> type return_type
+%type <dataType> type return_type function_invocation
 %type <dataValue> expression literal_const
 %type <func_arg> arg
 %type <func_args> formal_args
+%type <func_call> comma_separated_expression
 
 %start program
 
@@ -235,9 +237,8 @@ formal_args:
                 arg
                 {
                     // Create a vector which store only one arg.
-                    vector<SymInfo*>* temp = new vector<SymInfo*>();
-                    temp->push_back($1);
-                    $$ = temp;
+                    $$ = new vector<SymInfo*>();
+                    $$->push_back($1);
                 }
                 | arg ',' formal_args
                 {
@@ -340,8 +341,10 @@ expression:
                 }
                 | function_invocation
                 {
-                    Trace("Reducing to function invocation expression");
-                    // NOT YET DONE!!!!
+                    // Only get function type
+                    Data* d = new Data();
+                    d->set_data_type($1);
+                    $$ = d;
                 }
                 | ID
                 {
@@ -727,13 +730,43 @@ function_invocation:
                 ID '(' comma_separated_expression ')'
                 {
                     Trace("Reducing to function invocation");
+                    SymInfo* id = symbol_tables.look_up(*$1);
+                    if (id == NULL)
+                    {
+                        yyerror(string("ID " + *$1 +" Not FOUND"));
+                    }
+                    if (id->get_declare_type() != DEC_DEF)
+                    {
+                        yyerror(string("ID " + *$1 +" function invocation must be declare as DEF"));
+                    }
+                    // Check if comma_separated_exp type is equal to function args
+                    if (id->check_arg_match($3) == false)
+                    {
+                        yyerror("Function arg type mismatch");
+                    }
+                    if (id->get_return_type() == TYPE_NONE)
+                    {
+                        yyerror(string("ID " + *$1 + " function without return"));
+                    }
+                    $$ = id->get_return_type();
                 }
                 ;
 
 comma_separated_expression:
                 expression
+                {
+                    $$ = new vector<Data*>();
+                    $$->push_back($1);
+                }
                 | expression ',' comma_separated_expression
+                {
+                    $3->push_back($1);
+                    $$ = $3;
+                }
                 | /* optional */
+                {
+                    $$ = new vector<Data*>();
+                }
                 ;
 
 block:
