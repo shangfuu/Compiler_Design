@@ -226,7 +226,20 @@ void SymTable::dump()
 {
     for(auto p : table)
     {
-        cout << p.second->get_id_name() << endl;
+        cout << "ID: " << p.second->get_id_name() << "\t\tDeclare type: " << p.second->get_declare_type();
+        if (p.second->get_declare_type() == DEC_VAL || p.second->get_declare_type() == DEC_VAR)
+        {
+            cout << "\t\tData type: "  << p.second->get_data_type() << endl;
+        }
+        else if (p.second->get_declare_type() == DEC_ARRAY)
+        {
+            cout << "\t\tData type: "  << p.second->get_array_data_type() << endl;
+        }
+        else
+        {
+            cout << endl;
+        }
+        
     }
 }
 
@@ -279,10 +292,12 @@ SymInfo* SymbolTables::look_up(string id_name)
 
 void SymbolTables::dump()
 {
+    cout << endl << "------------Dump Symbol Table------------" << endl;
     for(int i = 0; i <= top; i++)
     {
-        cout << "===== Table " << i << " =====" << endl;
+        cout << "================ Table " << i << " ================" << endl;
         tables[i].dump();
-        cout << "===================" << endl;
+        cout << "=========================================" << endl;
     }
+    cout << endl;
 }

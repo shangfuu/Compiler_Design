@@ -79,7 +79,7 @@ void insertTableEntry(SymInfo*);
 program:
                 OBJECT ID
                 {
-                    Trace("Reducing to program\n");
+                    Trace("REDUCE < PROGRAM >\n");
                     // Insert ID in current table.
                     insertTableEntry(new SymInfo(*$2, DEC_OBJECT));
                 }
@@ -174,7 +174,7 @@ method_decs:
 method_dec:     
                 DEF ID '(' formal_args ')' return_type
                 {
-                    Trace("Reducing to method declartion");
+                    Trace("REDUCE < METHOD () >");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
                     // Add function arg type. use to check.
@@ -204,7 +204,7 @@ method_dec:
                 /* Parentheses are not required when no arguments are declared */
                 | DEF ID return_type
                 {
-                    Trace("Reducing to method declartion");
+                    Trace("REDUCE < METHOD >");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
                     func->set_return_type($3);
@@ -276,57 +276,63 @@ statement:
 simple_statement:
                 ID '=' expression
                 {
-                    Trace("Reducing to simple statement");
+                    Trace("REDUCE < ID = EXP >");
                     // Check if ID exist in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
                     if (id == NULL)
                     {
                         yyerror(string("ID " + *$1 +" Not FOUND"));
                     }
-                    // Declare must be DEC_VAR
-                    if (id->get_declare_type() != DEC_VAR)
+                    else
                     {
-                        yyerror(string("ID " + *$1 + " VAL can't be assign"));
-                    }   
-                    // Only assign with same data type
-                    if (id->get_data_type() != $3->get_data_type())
-                    {
-                        yyerror(string("ID " + *$1 + " Assign with different Data type"));
+                        // Declare must be DEC_VAR
+                        if (id->get_declare_type() != DEC_VAR)
+                        {
+                            yyerror(string("ID " + *$1 + " VAL can't be assign"));
+                        }   
+                        // Only assign with same data type
+                        if (id->get_data_type() != $3->get_data_type())
+                        {
+                            yyerror(string("ID " + *$1 + " Assign with different Data type"));
+                        }
+                        // Set variable data
+                        id->set_data(*$3);
                     }
-                    // Set variable data
-                    id->set_data(*$3);
                 }
                 | ID '[' expression ']' '=' expression
                 {
-                    Trace("Reducing to simple statement");
+                    Trace("REDUCE < ID[EXP] = EXP >");
                     // Check if ID exist in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
                     if (id == NULL)
                     {
                         yyerror(string("ID " + *$1 +" Not FOUND"));
                     }
-                    // Index must be int
-                    if ($3->get_data_type() != TYPE_INT)
+                    else 
                     {
-                        yyerror(string("ID " + *$1 + " array index must be int"));
+                        // Index must be int
+                        if ($3->get_data_type() != TYPE_INT)
+                        {
+                            yyerror(string("ID " + *$1 + " array index must be int"));
+                        }
+                        // Declare type must be DEC_ARRAY;
+                        if (id->get_declare_type() != DEC_ARRAY)
+                        {
+                            yyerror(string("ID " + *$1 + " not array type"));
+                        }
+                        // Only assign with same data type
+                        if (id->get_array_data_type() != $6->get_data_type())
+                        {
+                            yyerror(string("ID " + *$1 + " Assign with different Data type"));
+                        }
+                        // Check if index out of range
+                        if (id->get_array_length() <= $3->get_int())
+                        {
+                            yyerror(string("ID " + *$1 + " array index out of range"));
+                        }
+                        // Set array[index] data.
+                        id->set_array_data($3->get_int(), *$6);
                     }
-                    // Declare type must be DEC_ARRAY;
-                    if (id->get_declare_type() != DEC_ARRAY)
-                    {
-                        yyerror(string("ID " + *$1 + " not array type"));
-                    }
-                    // Only assign with same data type
-                    if (id->get_array_data_type() != $6->get_data_type())
-                    {
-                        yyerror(string("ID " + *$1 + " Assign with different Data type"));
-                    }
-                    // Check if index out of range
-                    if (id->get_array_length() <= $3->get_int())
-                    {
-                        yyerror(string("ID " + *$1 + " array index out of range"));
-                    }
-                    // Set array[index] data.
-                    id->set_array_data($3->get_int(), *$6);
                 }
                 | PRINT '(' expression ')'
                 | PRINTLN '(' expression ')'
@@ -338,7 +344,7 @@ simple_statement:
 expression:     
                 literal_const
                 {
-                    Trace("Reducing to literal constants expression");
+                    Trace("REDUCE < LITERAL CONST >");
                     $$ = $1;
                 }
                 | function_invocation
@@ -350,7 +356,7 @@ expression:
                 }
                 | ID
                 {
-                    Trace("Reducing to ID expression");
+                    Trace("REDUCE < ID >");
                     // Check if ID exist in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
                     
@@ -358,35 +364,41 @@ expression:
                     {
                         yyerror(string("ID " + *$1 +" Not FOUND"));
                     }
-                    // Return ID data.
-                    $$ = id->get_data();
+                    else
+                    {
+                        // Return ID data.
+                        $$ = id->get_data();
+                    }
                 }
                 | ID '[' expression ']'
                 {
-                    Trace("Reducing to array expression");
+                    Trace("REDUCE < ID[EXP] >");
                     // Check if ID exist in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
                     if (id == NULL)
                     {
                         yyerror(string("ID " + *$1 +" Not FOUND"));
                     }
-                    // Check if index out of range
-                    if (id->get_array_length() <= $3->get_int())
+                    else
                     {
-                        yyerror(string("ID " + *$1 + " array index out of range"));
+                        // Check if index out of range
+                        if (id->get_array_length() <= $3->get_int())
+                        {
+                            yyerror(string("ID " + *$1 + " array index out of range"));
+                        }
+                        // Declare type must be DEC_ARRAY;
+                        if (id->get_declare_type() != DEC_ARRAY)
+                        {
+                            yyerror(string("ID " + *$1 + " not array type"));
+                        }
+                        // Return ID[index] data.
+                        $$ = id->get_array_data($3->get_int());
                     }
-                    // Declare type must be DEC_ARRAY;
-                    if (id->get_declare_type() != DEC_ARRAY)
-                    {
-                        yyerror(string("ID " + *$1 + " not array type"));
-                    }
-                    // Return ID[index] data.
-                    $$ = id->get_array_data($3->get_int());
                 }
                 /* Arithmetic expression */
                 | '-' expression %prec UMINUS
                 {
-                    Trace("Reducing to UMINUS expression");
+                    Trace("REDUCE < - EXP >");
                     // Only calculate the type INT and FLOAT
                     if ($2->get_data_type() == TYPE_INT)
                     {
@@ -405,7 +417,7 @@ expression:
                 }
                 | expression '*' expression
                 {
-                    Trace("Reducing to exp * exp");
+                    Trace("REDUCE < EXP * EXP >");
                     // Only calculate the type INT and FLOAT
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -428,7 +440,7 @@ expression:
                 }
                 | expression '/' expression
                 {
-                    Trace("Reducing to exp / exp");
+                    Trace("REDUCE < EXP / EXP >");
                     // Only calculate the type INT and FLOAT
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -451,7 +463,7 @@ expression:
                 }
                 | expression '+' expression
                 {
-                    Trace("Reducing to exp + exp");
+                    Trace("REDUCE < EXP + EXP >");
                     // Only calculate the type INT and FLOAT
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -474,7 +486,7 @@ expression:
                 }
                 | expression '-' expression
                 {
-                    Trace("Reducing to exp - exp");
+                    Trace("REDUCE < EXP - EXP >");
                     // Only calculate the type INT and FLOAT
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -497,7 +509,7 @@ expression:
                 }
                 | expression LT expression
                 {
-                    Trace("Reducing to exp < exp");
+                    Trace("REDUCE < EXP < EXP >");
                     // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -527,7 +539,7 @@ expression:
                 }
                 | expression LE expression
                 {
-                    Trace("Reducing to exp <= exp");
+                    Trace("REDUCE < EXP <= EXP >");
                     // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -557,7 +569,7 @@ expression:
                 }
                 | expression GT expression
                 {
-                    Trace("Reducing to exp > exp");
+                    Trace("REDUCE < EXP > EXP >");
                     // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -587,7 +599,7 @@ expression:
                 }
                 | expression GE expression
                 {
-                    Trace("Reducing to exp >= exp");
+                    Trace("REDUCE < EXP >= EXP >");
                     // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -617,7 +629,7 @@ expression:
                 }
                 | expression EE expression
                 {
-                    Trace("Reducing to exp == exp");
+                    Trace("REDUCE < EXP == EXP >");
                     // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -647,7 +659,7 @@ expression:
                 }
                 | expression NE expression
                 {
-                    Trace("Reducing to exp != exp");
+                    Trace("REDUCE < EXP != EXP >");
                     // Only calculate the type INT, FLOAT and BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -677,7 +689,7 @@ expression:
                 }
                 | NOT expression
                 {
-                    Trace("Reducing to ! exp");
+                    Trace("REDUCE < ! EXP >");
                     // Only calculate the type BOOL
                     if ($2->get_data_type() == TYPE_BOOL)
                     {
@@ -691,7 +703,7 @@ expression:
                 }
                 | expression AND expression
                 {
-                    Trace("Reducing to exp && exp");
+                    Trace("REDUCE < EXP && EXP >");
                     // Only calculate the type BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -709,7 +721,7 @@ expression:
                 }
                 | expression OR expression
                 {
-                    Trace("Reducing to exp || exp");
+                    Trace("REDUCE < EXP || EXP >");
                     // Only calculate the type BOOL
                     if ($1->get_data_type() != $3->get_data_type())
                     {
@@ -758,13 +770,15 @@ literal_const:
 function_invocation:
                 ID '(' comma_separated_expression ')'
                 {
-                    Trace("Reducing to function invocation");
+                    Trace("REDUCE < ID(EXP) >");
                     SymInfo* id = symbol_tables.look_up(*$1);
                     if (id == NULL)
                     {
                         yyerror(string("ID " + *$1 +" Not FOUND"));
                     }
-                    if (id->get_declare_type() != DEC_DEF)
+                    else
+                    {
+                        if (id->get_declare_type() != DEC_DEF)
                     {
                         yyerror(string("ID " + *$1 +" function invocation must be declare as DEF"));
                     }
@@ -778,6 +792,7 @@ function_invocation:
                         yyerror(string("ID " + *$1 + " function without return"));
                     }
                     $$ = id->get_return_type();
+                    }
                 }
                 ;
 
@@ -801,7 +816,7 @@ comma_separated_expression:
 block:
                 '{'
                 {
-                    Trace("Reducing to block");
+                    Trace("REDUCE < BLOCK {} >");
                     // Create a new child table
                     symbol_tables.add_table();
                 }
@@ -820,7 +835,7 @@ one_or_more_statements:
 condition:
                 IF '(' expression ')'
                 {
-                    Trace("Reducing to IF ELSE condition");
+                    Trace("REDUCE < IF (EXP) >");
                     if ($3->get_data_type() != TYPE_BOOL)
                     {
                         yyerror("IF condition must be boolean");
@@ -841,7 +856,7 @@ block_or_simple_statement:
 loop:
                 WHILE '(' expression ')'
                 {
-                    Trace("Reducing to while");
+                    Trace("REDUCE < WHILE (EXP) >");
                     if ($3->get_data_type() != TYPE_BOOL)
                     {
                         yyerror("WHILE expression must be boolean");
@@ -850,7 +865,7 @@ loop:
                 block_or_simple_statement
                 | FOR '(' ID LT '-' CONST_INT TO CONST_INT ')'
                 {
-                    Trace("Reducing to for");
+                    Trace("REDUCE < FOR >");
                 }
                 block_or_simple_statement
                 ;
@@ -858,7 +873,7 @@ loop:
 procedure_invocation:
                 ID
                 {
-                    Trace("Reducing to procedure invocation");
+                    Trace("REDUCE < PROCEDURE ID >");
                     // Check if ID procedure is in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
                     if (id == NULL)
@@ -868,7 +883,7 @@ procedure_invocation:
                 }
                 | ID '(' comma_separated_expression ')'
                 {
-                     Trace("Reducing to procedure invocation");
+                     Trace("REDUCE < PROCEDURE ID (COMMA-SEP-EXP) >");
                     // Check if ID procedure is in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
                     if (id == NULL)
@@ -913,5 +928,5 @@ main(int argc, char* argv[])
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
     else
-        cout << "Parsing succedd!" << endl;
+        cout << "Parsing succeed!" << endl;
 }

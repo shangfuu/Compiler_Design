@@ -1,14 +1,21 @@
 %{
 
 #include "y.tab.hpp"
+#include "iostream"
+#include "string"
+
 #define LEX_DEBUG 0
 
 #define LIST     strcat(buf,yytext)
 // Add return
-#define token(t) {	LIST; if(LEX_DEBUG){ printf("<%s>\n", #t);} return t; }
-#define tokenInteger(t,i) {LIST; if(LEX_DEBUG){ printf("<%s: %d>\n",#t,i);} }
-#define tokenString(t,s) {LIST; if(LEX_DEBUG){ printf("<%s: %s>\n",#t,s);} }
-#define tokenFloat(t,f)  {LIST; if(LEX_DEBUG){ printf("<%s: %lf>\n",#t,f);} }
+#define token(t) {	LIST; if(LEX_DEBUG){ std::cout << '<' << t << '>' << std::endl;} return t; }
+#define tokenInteger(t,i) {LIST; if(LEX_DEBUG){ std::cout << '<' << t << ": " << i << '>' << std::endl;} }
+#define tokenString(t,s) {LIST; if(LEX_DEBUG){ std::cout << '<' << t << ": " << s << '>' << std::endl;} }
+#define tokenFloat(t,f)  {LIST; if(LEX_DEBUG){ std::cout << '<' << t << ": " << f << '>' << std::endl;} }
+// #define token(t) {	LIST; if(LEX_DEBUG){ printf("<%s>\n", #t);} return t; }
+// #define tokenInteger(t,i) {LIST; if(LEX_DEBUG){ printf("<%s: %d>\n",#t,i);} }
+// #define tokenString(t,s) {LIST; if(LEX_DEBUG){ printf("<%s: %s>\n",#t,s);} }
+// #define tokenFloat(t,f)  {LIST; if(LEX_DEBUG){ printf("<%s: %lf>\n",#t,f);} }
 
 #define MAX_LINE_LENG 256
 
