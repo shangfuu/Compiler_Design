@@ -1,5 +1,57 @@
 #include "symTable.h"
 
+/* enum to string */
+
+string data_type_to_string(_Data_type type)
+{
+    switch (type)
+    {
+    case TYPE_INT:
+        return "TYPE_INT";
+        break;
+    case TYPE_FLOAT:
+        return "TYPE_FLOAT";
+        break;
+    case TYPE_CHAR:
+        return "TYPE_CHAR";
+        break;
+    case TYPE_STRING:
+        return "TYPE_STRING";
+        break; 
+    case TYPE_BOOL:
+        return "TYPE_BOOL";
+        break;
+    default:
+        break;
+    }
+    return "TYPE_NONE";
+}
+
+string declare_type_to_string(_Declare_type dec)
+{
+    switch (dec)
+    {
+    case DEC_VAL:
+        return "DEC_VAL";
+        break;
+    case DEC_VAR:
+        return "DEC_VAR";
+        break;
+    case DEC_ARRAY:
+        return "DEC_ARRAY";
+        break;
+    case DEC_DEF:
+        return "DEC_DEF";
+        break;
+    case DEC_OBJECT:
+        return "DEC_OBJECT";
+        break;
+    default:
+        break;
+    }
+    return "DEC_ERROR";
+}
+
 /* Data */
 
 Data::Data()
@@ -226,20 +278,19 @@ void SymTable::dump()
 {
     for(auto p : table)
     {
-        cout << "ID: " << p.second->get_id_name() << "\t\tDeclare type: " << p.second->get_declare_type();
+        cout << "ID: " << p.second->get_id_name() << "\t\tDeclare type: " << declare_type_to_string(p.second->get_declare_type());
         if (p.second->get_declare_type() == DEC_VAL || p.second->get_declare_type() == DEC_VAR)
         {
-            cout << "\t\tData type: "  << p.second->get_data_type() << endl;
+            cout << "\t\tData type: " << data_type_to_string(p.second->get_data_type()) << endl;
         }
         else if (p.second->get_declare_type() == DEC_ARRAY)
         {
-            cout << "\t\tData type: "  << p.second->get_array_data_type() << endl;
+            cout << "\t\tData type: "  << data_type_to_string(p.second->get_array_data_type()) << endl;
         }
         else
         {
             cout << endl;
         }
-        
     }
 }
 
@@ -301,3 +352,4 @@ void SymbolTables::dump()
     }
     cout << endl;
 }
+

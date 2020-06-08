@@ -215,5 +215,7 @@ public:
     void dump();
 };
 
+string data_type_to_string(_Data_type);
+string declare_type_to_string(_Declare_type);
 
 #endif  
