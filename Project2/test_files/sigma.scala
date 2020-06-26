@@ -10,7 +10,7 @@ object Sigma
   var sum: int
   var index: int
 
-  def main () {
+  def man () {
     sum = 0
     index = 0
     

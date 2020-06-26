@@ -11,6 +11,8 @@ SymbolTables symbol_tables;
 
 void yyerror(string);
 
+bool hasDefineMain = false;
+
 // Insert ID in current table (tables[top]).
 void insertTableEntry(SymInfo*);
 %}
@@ -32,7 +34,6 @@ void insertTableEntry(SymInfo*);
     SymInfo *func_arg;
     vector<SymInfo*>* func_args;
     vector<Data*>* func_call;
-
 }
 
 /* tokens */
@@ -86,6 +87,10 @@ program:
                 '{' var_const_decs method_decs '}'
                 {
                     symbol_tables.dump();
+                    // If no main declare then Error
+                    if (hasDefineMain == false) {
+                        yyerror("No Main function Declare");
+                    }
                     // End block then pop current table.
                     symbol_tables.pop_table();
                 }
@@ -177,6 +182,10 @@ method_dec:
                     Trace("REDUCE < METHOD () >");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
+                    // Check if main declare
+                    if (func->get_id_name() == "main") {
+                        hasDefineMain = true;
+                    }
                     // Add function arg type. use to check.
                     for(int i = 0 ; i < $4->size(); i++)
                     {
@@ -207,6 +216,12 @@ method_dec:
                     Trace("REDUCE < METHOD >");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
+
+                    // Check if main declare
+                    if (func->get_id_name() == "main") {
+                        hasDefineMain = true;
+                    }
+
                     func->set_return_type($3);
                     // Add func into current table.
                     insertTableEntry(func);
@@ -291,12 +306,15 @@ simple_statement:
                             yyerror(string("ID " + *$1 + " VAL can't be assign"));
                         }   
                         // Only assign with same data type
-                        if (id->get_data_type() != $3->get_data_type())
+                        else if (id->get_data_type() != $3->get_data_type())
                         {
                             yyerror(string("ID " + *$1 + " Assign with different Data type"));
                         }
-                        // Set variable data
-                        id->set_data(*$3);
+                        else 
+                        {
+                            // Set variable data
+                            id->set_data(*$3);
+                        }
                     }
                 }
                 | ID '[' expression ']' '=' expression
@@ -316,22 +334,25 @@ simple_statement:
                             yyerror(string("ID " + *$1 + " array index must be int"));
                         }
                         // Declare type must be DEC_ARRAY;
-                        if (id->get_declare_type() != DEC_ARRAY)
+                        else if (id->get_declare_type() != DEC_ARRAY)
                         {
                             yyerror(string("ID " + *$1 + " not array type"));
                         }
                         // Only assign with same data type
-                        if (id->get_array_data_type() != $6->get_data_type())
+                        else if (id->get_array_data_type() != $6->get_data_type())
                         {
                             yyerror(string("ID " + *$1 + " Assign with different Data type"));
                         }
                         // Check if index out of range
-                        if (id->get_array_length() <= $3->get_int())
+                        else if (id->get_array_length() <= $3->get_int())
                         {
                             yyerror(string("ID " + *$1 + " array index out of range"));
                         }
-                        // Set array[index] data.
-                        id->set_array_data($3->get_int(), *$6);
+                        else 
+                        {
+                            // Set array[index] data.
+                            id->set_array_data($3->get_int(), *$6);
+                        }
                     }
                 }
                 | PRINT '(' expression ')'
