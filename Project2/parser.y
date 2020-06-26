@@ -1,5 +1,5 @@
 %{
-#define YACC_DEBUG 1
+#define YACC_DEBUG 0
 #define Trace(t)    if(YACC_DEBUG){ cout << "Trace: " << t << endl; }
 
 #include "symTable.h"
@@ -359,7 +359,6 @@ expression:
                     Trace("REDUCE < ID >");
                     // Check if ID exist in symbol table.
                     SymInfo* id = symbol_tables.look_up(*$1);
-                    
                     if (id == NULL)
                     {
                         yyerror(string("ID " + *$1 +" Not FOUND"));
@@ -402,13 +401,13 @@ expression:
                     // Only calculate the type INT and FLOAT
                     if ($2->get_data_type() == TYPE_INT)
                     {
-                        $2->set_value($2->get_int() * -1);
-                        $$ = $2;
+                        Data *d = new Data(TYPE_INT, $2->get_int() * -1);
+                        $$ = d;
                     }
                     else if ($2->get_data_type() == TYPE_FLOAT)
                     {
-                        $2->set_value($2->get_float() * -1);
-                        $$ = $2;
+                        Data *d = new Data(TYPE_FLOAT, $2->get_float() * -1);
+                        $$ = d;
                     }
                     else 
                     {
@@ -423,19 +422,21 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_INT)
-                    {
-                        $1->set_value($1->get_int() * $3->get_int());
-                        $$ = $1;
-                    }
-                    else if ($1->get_data_type() == TYPE_FLOAT)
-                    {
-                        $1->set_value($1->get_float() * $3->get_float());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp * exp");
+                    else {
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            Data *d = new Data(TYPE_INT, $1->get_int() * $3->get_int());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            Data *d = new Data(TYPE_FLOAT, $1->get_float() * $3->get_float());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp * exp");
+                        }
                     }
                 }
                 | expression '/' expression
@@ -446,19 +447,21 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_INT)
-                    {
-                        $1->set_value($1->get_int() / $3->get_int());
-                        $$ = $1;
-                    }
-                    else if ($1->get_data_type() == TYPE_FLOAT)
-                    {
-                        $1->set_value($1->get_float() / $3->get_float());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp / exp");
+                    else {
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            Data *d = new Data(TYPE_INT, $1->get_int() / $3->get_int());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            Data *d = new Data(TYPE_FLOAT, $1->get_float() / $3->get_float());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp / exp");
+                        }
                     }
                 }
                 | expression '+' expression
@@ -469,19 +472,21 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_INT)
-                    {
-                        $1->set_value($1->get_int() + $3->get_int());
-                        $$ = $1;
-                    }
-                    else if ($1->get_data_type() == TYPE_FLOAT)
-                    {
-                        $1->set_value($1->get_float() + $3->get_float());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp + exp");
+                    else {
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            Data *d = new Data(TYPE_INT, $1->get_int() + $3->get_int());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            Data *d = new Data(TYPE_FLOAT, $1->get_float() + $3->get_float());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp + exp");
+                        }
                     }
                 }
                 | expression '-' expression
@@ -492,19 +497,21 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_INT)
-                    {
-                        $1->set_value($1->get_int() - $3->get_int());
-                        $$ = $1;
-                    }
-                    else if ($1->get_data_type() == TYPE_FLOAT)
-                    {
-                        $1->set_value($1->get_float() - $3->get_float());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp - exp");
+                    else {
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            Data *d = new Data(TYPE_INT, $1->get_int() - $3->get_int());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            Data *d = new Data(TYPE_FLOAT, $1->get_float() - $3->get_float());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp - exp");
+                        }
                     }
                 }
                 | expression LT expression
@@ -515,27 +522,30 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_INT)
-                    {
-                        $1->set_value($1->get_int() < $3->get_int());
-                        $$ = $1;
+                    else {
+                        // Used to return
+                        Data *d = new Data(TYPE_BOOL, false);
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            d->set_value($1->get_int() < $3->get_int());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            d->set_value($1->get_float() < $3->get_float());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_BOOL)
+                        {
+                            
+                            d->set_value($1->get_bool() < $3->get_bool());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp < exp");
+                        }
                     }
-                    else if ($1->get_data_type() == TYPE_FLOAT)
-                    {
-                        $1->set_value($1->get_float() < $3->get_float());
-                        $$ = $1;
-                    }
-                    else if ($1->get_data_type() == TYPE_BOOL)
-                    {
-                        $1->set_value($1->get_bool() < $3->get_bool());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp < exp");
-                    }
-                    // Return BOOLEAN type
-                    $$->set_data_type(TYPE_BOOL);
                 }
                 | expression LE expression
                 {
@@ -545,27 +555,28 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_INT)
-                    {
-                        $1->set_value($1->get_int() <= $3->get_int());
-                        $$ = $1;
+                    else {
+                        Data *d = new Data(TYPE_BOOL, false);
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            d->set_value($1->get_int() <= $3->get_int());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            d->set_value($1->get_float() <= $3->get_float());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_BOOL)
+                        {
+                            d->set_value($1->get_bool() <= $3->get_bool());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp <= exp");
+                        }
                     }
-                    else if ($1->get_data_type() == TYPE_FLOAT)
-                    {
-                        $1->set_value($1->get_float() <= $3->get_float());
-                        $$ = $1;
-                    }
-                    else if ($1->get_data_type() == TYPE_BOOL)
-                    {
-                        $1->set_value($1->get_bool() <= $3->get_bool());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp <= exp");
-                    }
-                    // Return BOOLEAN type
-                    $$->set_data_type(TYPE_BOOL);
                 }
                 | expression GT expression
                 {
@@ -575,27 +586,28 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_INT)
-                    {
-                        $1->set_value($1->get_int() > $3->get_int());
-                        $$ = $1;
+                    else {
+                        Data *d = new Data(TYPE_BOOL, false);
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            d->set_value($1->get_int() > $3->get_int());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            d->set_value($1->get_float() > $3->get_float());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_BOOL)
+                        {
+                            d->set_value($1->get_bool() > $3->get_bool());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp > exp");
+                        }
                     }
-                    else if ($1->get_data_type() == TYPE_FLOAT)
-                    {
-                        $1->set_value($1->get_float() > $3->get_float());
-                        $$ = $1;
-                    }
-                    else if ($1->get_data_type() == TYPE_BOOL)
-                    {
-                        $1->set_value($1->get_bool() > $3->get_bool());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp > exp");
-                    }
-                    // Return BOOLEAN type
-                    $$->set_data_type(TYPE_BOOL);
                 }
                 | expression GE expression
                 {
@@ -605,27 +617,28 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_INT)
-                    {
-                        $1->set_value($1->get_int() >= $3->get_int());
-                        $$ = $1;
+                    else {
+                        Data *d = new Data(TYPE_BOOL, false);
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            d->set_value($1->get_int() >= $3->get_int());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            d->set_value($1->get_float() >= $3->get_float());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_BOOL)
+                        {
+                            d->set_value($1->get_bool() >= $3->get_bool());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp >= exp");
+                        }
                     }
-                    else if ($1->get_data_type() == TYPE_FLOAT)
-                    {
-                        $1->set_value($1->get_float() >= $3->get_float());
-                        $$ = $1;
-                    }
-                    else if ($1->get_data_type() == TYPE_BOOL)
-                    {
-                        $1->set_value($1->get_bool() >= $3->get_bool());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp >= exp");
-                    }
-                    // Return BOOLEAN type
-                    $$->set_data_type(TYPE_BOOL);
                 }
                 | expression EE expression
                 {
@@ -635,27 +648,28 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_INT)
-                    {
-                        $1->set_value($1->get_int() == $3->get_int());
-                        $$ = $1;
+                    else {
+                        Data *d = new Data(TYPE_BOOL, false);
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            d->set_value($1->get_int() == $3->get_int());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            d->set_value($1->get_float() == $3->get_float());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_BOOL)
+                        {
+                            d->set_value($1->get_bool() == $3->get_bool());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp == exp");
+                        }
                     }
-                    else if ($1->get_data_type() == TYPE_FLOAT)
-                    {
-                        $1->set_value($1->get_float() == $3->get_float());
-                        $$ = $1;
-                    }
-                    else if ($1->get_data_type() == TYPE_BOOL)
-                    {
-                        $1->set_value($1->get_bool() == $3->get_bool());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp == exp");
-                    }
-                    // Return BOOLEAN type
-                    $$->set_data_type(TYPE_BOOL);
                 }
                 | expression NE expression
                 {
@@ -665,27 +679,28 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_INT)
-                    {
-                        $1->set_value($1->get_int() != $3->get_int());
-                        $$ = $1;
+                    else {
+                        Data *d = new Data(TYPE_BOOL, false);
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            d->set_value($1->get_int() != $3->get_int());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            d->set_value($1->get_float() != $3->get_float());
+                            $$ = d;
+                        }
+                        else if ($1->get_data_type() == TYPE_BOOL)
+                        {
+                            d->set_value($1->get_bool() != $3->get_bool());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp != exp");
+                        }
                     }
-                    else if ($1->get_data_type() == TYPE_FLOAT)
-                    {
-                        $1->set_value($1->get_float() != $3->get_float());
-                        $$ = $1;
-                    }
-                    else if ($1->get_data_type() == TYPE_BOOL)
-                    {
-                        $1->set_value($1->get_bool() != $3->get_bool());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp != exp");
-                    }
-                    // Return BOOLEAN type
-                    $$->set_data_type(TYPE_BOOL);
                 }
                 | NOT expression
                 {
@@ -693,8 +708,9 @@ expression:
                     // Only calculate the type BOOL
                     if ($2->get_data_type() == TYPE_BOOL)
                     {
-                        $2->set_value(!$2->get_bool());
-                        $$ = $2;
+                        Data *d = new Data(TYPE_BOOL, false);
+                        d->set_value(!$2->get_bool());
+                        $$ = d;
                     }
                     else
                     {
@@ -709,14 +725,17 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_BOOL)
-                    {
-                        $1->set_value($1->get_bool() && $3->get_bool());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp && exp");
+                    else {
+                        Data *d = new Data(TYPE_BOOL, false);
+                        if ($1->get_data_type() == TYPE_BOOL)
+                        {
+                            d->set_value($1->get_bool() && $3->get_bool());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp && exp");
+                        }
                     }
                 }
                 | expression OR expression
@@ -727,14 +746,17 @@ expression:
                     {
                         yyerror("Types of the left/right-hand-side must be matched.");
                     }
-                    if ($1->get_data_type() == TYPE_BOOL)
-                    {
-                        $1->set_value($1->get_bool() || $3->get_bool());
-                        $$ = $1;
-                    }
-                    else
-                    {
-                        yyerror("TYPE ERROR in exp || exp");
+                    else {
+                        Data *d = new Data(TYPE_BOOL, false);
+                        if ($1->get_data_type() == TYPE_BOOL)
+                        {
+                            d->set_value($1->get_bool() || $3->get_bool());
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp || exp");
+                        }
                     }
                 }
                 ;
