@@ -13,3 +13,8 @@ scanner
 
 # reference file
 ref.l
+
+# ZIP file
+.zip
+.rar
+
