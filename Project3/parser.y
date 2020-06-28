@@ -235,42 +235,48 @@ method_decs:
                 ;
 
 method_dec:     
-                DEF ID '(' formal_args ')' return_type
+                DEF ID 
                 {
                     Trace("REDUCE < METHOD () >");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
-                    func->set_return_type($6);
+                    // Add func into current table.
+                    insertTableEntry(func);
                     // Zero out variable stack
                     stackVarID = 0;
 
-                    // Add function arg type. use to check.
-                    for(int i = 0 ; i < $4->size(); i++)
-                    {
-                        func->add_arg_type((*$4)[i]->get_data_type());
-                    }
-                    
-                    // Check if main declare
-                    if (func->get_id_name() == "main") 
-                    {
-                        hasDefineMain = true;
-                        JBC_MainBegin();
-                    }
-                    else
-                    {
-                        JBC_FuncBegin(*func);
-                    }
-
-                    // Add func into current table.
-                    insertTableEntry(func);
-
                     /* Create a new child table. */
                     symbol_tables.add_table();
-                    // Add func ags into new table.
-                    for (int i = 0 ; i < $4->size(); i++)
+                }
+                '(' formal_args ')' return_type
+                {
+                    SymInfo* func = symbol_tables.look_up(*$2);
+                    if (func != NULL)
                     {
-                        insertTableEntry((*$4)[i]);
+                        func->set_return_type($7);
+
+                        // Add function arg type. use to check.
+                        for(int i = 0 ; i < $5->size(); i++)
+                        {
+                            func->add_arg_type((*$5)[i]->get_data_type());
+                        }
+
+                        // Check if main declare
+                        if (func->get_id_name() == "main") 
+                        {
+                            hasDefineMain = true;
+                            JBC_MainBegin();
+                        }
+                        else
+                        {
+                            JBC_FuncBegin(*func);
+                        }
                     }
+                    // // Add func ags into new table.
+                    // for (int i = 0 ; i < $5->size(); i++)
+                    // {
+                    //     insertTableEntry((*$5)[i]);
+                    // }
                 }
                 '{' var_const_decs statements '}'
                 {
@@ -287,6 +293,7 @@ method_dec:
                     Trace("REDUCE < METHOD >");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
+                    
                     func->set_return_type($3);
                     // Zero out variable stack
                     stackVarID = 0;
@@ -352,8 +359,11 @@ formal_args:
 arg:            
                 ID ':' type
                 {
-                    // Method args are all immutable
-                    $$ = new SymInfo(*$1, DEC_VAL, $3);
+                    $$ = new SymInfo(*$1, DEC_VAR, $3);
+                    if (insertTableEntry($$))
+                    {
+                        $$->stackID = stackVarID++;
+                    }
                 }
                 ;
 

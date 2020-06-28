@@ -23,6 +23,15 @@ object example {
       print -c
     else
       print c
+
+    if (c < 10){
+      print -c
+    }
+    else
+    {
+      print c
+    }
+
     println ("Hello World")
   }
 }

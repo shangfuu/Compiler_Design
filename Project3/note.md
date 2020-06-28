@@ -7,6 +7,8 @@
 5. Add EXP : (EXP) into rules of EXP.
 6. Change all Bool value to Int.
 7. Change Lex OP_arith from [-%+*/] to [\-\%\+\*\/] to avoid problem happen.
+8. arg are not immutable anymore, they are all VAR
+9. rewrite function declaretion
 
 # How to Run
 
