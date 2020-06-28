@@ -21,3 +21,5 @@ ref.l
 # vscode
 .vscode
 
+# MacOs
+.DS_Store

@@ -243,6 +243,12 @@ method_dec:
                     func->set_return_type($6);
                     // Zero out variable stack
                     stackVarID = 0;
+
+                    // Add function arg type. use to check.
+                    for(int i = 0 ; i < $4->size(); i++)
+                    {
+                        func->add_arg_type((*$4)[i]->get_data_type());
+                    }
                     
                     // Check if main declare
                     if (func->get_id_name() == "main") 
@@ -255,12 +261,6 @@ method_dec:
                         JBC_FuncBegin(*func);
                     }
 
-                    // Add function arg type. use to check.
-                    for(int i = 0 ; i < $4->size(); i++)
-                    {
-                        func->add_arg_type((*$4)[i]->get_data_type());
-                    }
-                    
                     // Add func into current table.
                     insertTableEntry(func);
 
@@ -597,6 +597,32 @@ expression:
                         yyerror("TYPE ERROR in - exp");
                     }
                 }
+                | expression '%' expression
+                {
+                    Trace("REDUCE <EXP % EXP>");
+                    // Only calculate the type INT and FLOAT
+                    if ($1->get_data_type() != $3->get_data_type())
+                    {
+                        yyerror("Types of the left/right-hand-side must be matched.");
+                    }
+                    else {
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            Data *d = new Data(TYPE_INT, $1->get_int() % $3->get_int());
+                            $$ = d;
+                            JBC_OP('%');
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            Data *d = new Data(TYPE_FLOAT, fmod($1->get_float(), $3->get_float()));
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp % exp");
+                        }
+                    }
+                }
                 | expression '*' expression
                 {
                     Trace("REDUCE < EXP * EXP >");
@@ -701,32 +727,6 @@ expression:
                         }
                     }
                 }
-                | expression '%' expression
-                {
-                    Trace("REDUCE <EXP % EXP>");
-                    // Only calculate the type INT and FLOAT
-                    if ($1->get_data_type() != $3->get_data_type())
-                    {
-                        yyerror("Types of the left/right-hand-side must be matched.");
-                    }
-                    else {
-                        if ($1->get_data_type() == TYPE_INT)
-                        {
-                            Data *d = new Data(TYPE_INT, $1->get_int() % $3->get_int());
-                            $$ = d;
-                            JBC_OP('%');
-                        }
-                        else if ($1->get_data_type() == TYPE_FLOAT)
-                        {
-                            Data *d = new Data(TYPE_FLOAT, fmod($1->get_float(), $3->get_float()));
-                            $$ = d;
-                        }
-                        else
-                        {
-                            yyerror("TYPE ERROR in exp % exp");
-                        }
-                    }
-                }
                 | expression LT expression
                 {
                     Trace("REDUCE < EXP < EXP >");
@@ -742,6 +742,7 @@ expression:
                         {
                             d->set_value($1->get_int() < $3->get_int());
                             $$ = d;
+                            JBC_RELOP(IFLT);
                         }
                         else if ($1->get_data_type() == TYPE_FLOAT)
                         {
@@ -774,6 +775,7 @@ expression:
                         {
                             d->set_value($1->get_int() <= $3->get_int());
                             $$ = d;
+                            JBC_RELOP(IFLE);
                         }
                         else if ($1->get_data_type() == TYPE_FLOAT)
                         {
@@ -805,6 +807,7 @@ expression:
                         {
                             d->set_value($1->get_int() > $3->get_int());
                             $$ = d;
+                            JBC_RELOP(IFGT);
                         }
                         else if ($1->get_data_type() == TYPE_FLOAT)
                         {
@@ -836,6 +839,7 @@ expression:
                         {
                             d->set_value($1->get_int() >= $3->get_int());
                             $$ = d;
+                            JBC_RELOP(IFGE);
                         }
                         else if ($1->get_data_type() == TYPE_FLOAT)
                         {
@@ -867,6 +871,7 @@ expression:
                         {
                             d->set_value($1->get_int() == $3->get_int());
                             $$ = d;
+                            JBC_RELOP(IFEE);
                         }
                         else if ($1->get_data_type() == TYPE_FLOAT)
                         {
@@ -898,6 +903,7 @@ expression:
                         {
                             d->set_value($1->get_int() != $3->get_int());
                             $$ = d;
+                            JBC_RELOP(IFNE);
                         }
                         else if ($1->get_data_type() == TYPE_FLOAT)
                         {
