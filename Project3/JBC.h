@@ -46,8 +46,8 @@ void JBC_AssignGlobal(string);
 
 // Print
 void JBC_PrintStart();
-void JBC_PrintStr();
-void JNC_PrintInt();
+void JBC_Print(_Data_type);
+void JBC_PrintLn(_Data_type);
 
 /* Function */
 void JBC_MainStart();

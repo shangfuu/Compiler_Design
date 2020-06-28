@@ -21,7 +21,7 @@ string filename;
 ofstream JBC;
 
 // Variable stack index
-int stackVarID;
+int stackVarID = 0;
 
 // Insert ID in current table (tables[top]), return 1 if succedd.
 int insertTableEntry(SymInfo*);
@@ -150,9 +150,9 @@ var_dec:
                             if (symbol_tables.isGlobalTable())
                             {
                                 JBC_GlobalVar(*$2);
-                                JBC_AssignGlobal(*$2);
+                                // JBC_AssignGlobal(*$2);
                             }
-                            else 
+                            else
                             {
                                 SymInfo *id = symbol_tables.look_up(*$2);
                                 id->stackID = stackVarID;
@@ -185,7 +185,7 @@ var_dec:
                         if (symbol_tables.isGlobalTable())
                         {
                             JBC_GlobalVar(*$2);
-                            JBC_AssignGlobal(*$2);
+                            // JBC_AssignGlobal(*$2);
                         }
                         else 
                         {
@@ -396,6 +396,14 @@ simple_statement:
                         {
                             // Set variable data
                             id->set_data(*$3);
+                            if (id->isGlobal())
+                            {
+                                JBC_AssignGlobal(id->get_id_name());
+                            }
+                            else
+                            {
+                                JBC_AssignLocal(id->stackID);
+                            }
                         }
                     }
                 }
@@ -437,24 +445,62 @@ simple_statement:
                         }
                     }
                 }
-                | PRINT '(' expression ')'
-                | PRINTLN '(' expression ')'
+                | PRINT
+                {
+                    Trace("REDUCE < PRINT EXP >");
+                    JBC_PrintStart();
+                } 
+                expression
+                {
+                    JBC_Print($3->get_data_type());
+                }
+                | PRINTLN 
+                {
+                    Trace("REDUCE < PRINTLN EXP >");
+                    JBC_PrintStart();
+                }
+                expression
+                {
+                    JBC_PrintLn($3->get_data_type());
+                }
                 | READ ID
                 | RETURN expression
                 {
+                    Trace("REDUCE < RETURN EXP >");
                     JBC_IReturn();
                 }
                 | RETURN
                 {
+                    Trace("REDUCE < RETURN >");
                     JBC_Return();
                 }
                 ;
 
 expression:     
-                literal_const
+                '(' expression ')'
+                {
+                    Trace("REDUCE < ( EXP ) >");
+                    $$ = $2;
+                }
+                | literal_const
                 {
                     Trace("REDUCE < LITERAL CONST >");
                     $$ = $1;
+                    if (!symbol_tables.isGlobalTable())
+                    {
+                        if ($1->get_data_type() == TYPE_STRING)
+                        {
+                            JBC_PushStr(*($1->get_string()));
+                        }
+                        else if ($1->get_data_type() == TYPE_INT)
+                        {
+                            JBC_PushInt($1->get_int());
+                        }
+                        else if ($1->get_data_type() == TYPE_BOOL)
+                        {
+                            JBC_PushInt($1->get_bool()? 1:0);
+                        }
+                    }   
                 }
                 | function_invocation
                 | ID
@@ -936,7 +982,6 @@ literal_const:
                 {
                     Data *d = new Data(TYPE_INT, $1);
                     $$ = d;
-                    JBC_PushInt($1);
                 }
                 | CONST_REAL
                 {
@@ -952,13 +997,11 @@ literal_const:
                 {
                     Data *d = new Data(TYPE_STRING, $1);
                     $$ = d;
-                    JBC_PushStr(*$1);
                 }
                 | CONST_BOOL
                 {
                     Data *d = new Data(TYPE_BOOL, $1);
                     $$ = d;
-                    JBC_PushInt($1? 1:0);
                 }
                 ;
 
@@ -1131,7 +1174,7 @@ int main(int argc, char* argv[])
         filename = string(argv[1]);
         int dot = filename.find(".");
         filename = filename.substr(0, dot);
-        JBC.open(filename + ".jsam");
+        JBC.open(filename + ".jasm");
     }
 
     // JBC file not opened

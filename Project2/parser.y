@@ -952,7 +952,7 @@ void yyerror(string msg)
     cout << "yyerror: " << msg << endl;
 }
 
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     /* open the source program file */
     if (argc == 1) {

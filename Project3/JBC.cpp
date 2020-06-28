@@ -39,7 +39,7 @@ void JBC_getLocalVar(int index)
 // id =
 void  JBC_AssignGlobal(string id)
 {
-    JBC << "\t\tputstatic type " << filename << "." << id << endl;
+    JBC << "\t\tputstatic int " << filename << "." << id << endl;
 }
 
 void JBC_AssignLocal(int index)
@@ -88,14 +88,14 @@ void JBC_PrintStart()
     JBC << "\t\tgetstatic java.io.PrintStream java.lang.System.out" << endl;
 }
 
-void JBC_PrintStr()
+void JBC_Print(_Data_type type)
 {
-    JBC << "\t\tinvokevirtual void java.io.PrintStream.print(java.lang.String)" << endl;
+    JBC << "\t\tinvokevirtual void java.io.PrintStream.print(" << typeToString(type) << ")" << endl;
 }
 
-void JBC_PrintInt()
+void JBC_PrintLn(_Data_type type)
 {
-    JBC << "\t\tinvokevirtual void java.io.PrintStream.print(int)" << endl;
+    JBC << "\t\tinvokevirtual void java.io.PrintStream.println(" << typeToString(type) << ")" << endl;
 }
 
 /* Function */
@@ -108,7 +108,7 @@ void JBC_MainStart()
 
 void JBC_FuncStart(SymInfo id)
 {
-    JBC << "\tmethod public static " << typeToString(id.get_return_type()) << id.get_id_name() << "(";
+    JBC << "\tmethod public static " << typeToString(id.get_return_type()) << " " << id.get_id_name() << "(";
     // args type
     for(int i = 0 ; i < id.get_arg().size(); i++)
     {

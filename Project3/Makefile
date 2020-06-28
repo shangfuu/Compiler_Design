@@ -20,6 +20,7 @@ lex.yy.cpp: $(LEX_FILE) y.tab.hpp
 	lex -o lex.yy.cpp $(LEX_FILE)
 
 
+
 PHONY: clean run
 
 clean:
@@ -27,9 +28,13 @@ clean:
 	-rm *.o
 	-rm lex.yy.*
 	-rm compiler
+	-rm *.jasm
+	-rn *.class
+	-rm test_files/*.jasm
+	-rm test_files/*.class
 
-run:
+run: compiler
 	./compiler $(file).scala
 	./javaa_mac $(file).jasm
-	java_ $(file)
+	java $(file)
 
