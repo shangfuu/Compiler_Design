@@ -1,5 +1,7 @@
 #include "JBC.h"
 
+GOTO_Manager gotoM;
+
 /* Java Byte Code */
 
 void JBC_Init()
@@ -76,14 +78,34 @@ void JBC_OP(char op)
     }
 }
 
-void JBC_RELOP()
+void JBC_RELOP(_CONDITION op)
 {
+    JBC << "\t\tisub" << endl;
+    switch (op) 
+    {
+    case IFLT: JBC << "\t\tiflt "; break;
+    case IFLE: JBC << "\t\tifle "; break;
+    case IFGT: JBC << "\t\tifgt "; break;
+    case IFGE: JBC << "\t\tifge "; break;
+    case IFEE: JBC << "\t\tifeq "; break;
+    case IFNE: JBC << "\t\tifne "; break;
+    }
 
+    int L1 = gotoM.updateLn();
+    JBC << "L" << L1 << endl;
+    JBC << "\t\ticonst_0" << endl;
+
+    int L2 = gotoM.updateLn();
+    JBC << "\t\tgoto L" << L2 << endl;
+
+    JBC << "\tL" << L1 << ":" << endl;
+    JBC << "\t\ticonst_1" << endl;
+    JBC << "\tL" << L2 << ":" << endl;
 }
 
 /* Print */
 
-void JBC_PrintStart()
+void JBC_PrintBegin()
 {
     JBC << "\t\tgetstatic java.io.PrintStream java.lang.System.out" << endl;
 }
@@ -100,13 +122,13 @@ void JBC_PrintLn(_Data_type type)
 
 /* Function */
 
-void JBC_MainStart()
+void JBC_MainBegin()
 {
     JBC << "\tmethod public static void main(java.lang.String[])" << endl;
     JBC << "\tmax_stack 15" << endl << "\tmax_locals 15" << endl << "\t{" << endl;
 }
 
-void JBC_FuncStart(SymInfo id)
+void JBC_FuncBegin(SymInfo id)
 {
     JBC << "\tmethod public static " << typeToString(id.get_return_type()) << " " << id.get_id_name() << "(";
     // args type
@@ -150,6 +172,88 @@ void JBC_IReturn()
     JBC << "\t\tireturn" << endl;
 }
 
+/* GOTO Manager */
+
+L::L(int Ln)
+{
+    base = Ln;
+}
+
+GOTO_Manager::GOTO_Manager()
+{
+    Ln = 0;
+}
+
+void GOTO_Manager::pushL(int step)
+{
+    // Push current Ln and how much step can go.
+    Lstack.push(L(Ln));
+    Ln += step;
+}
+
+void GOTO_Manager::popL()
+{
+    Lstack.pop();
+}
+
+int GOTO_Manager::updateLn()
+{
+    return Ln++;
+}
+
+int GOTO_Manager::Lbase(int n)
+{
+    if (Lstack.top().base + n < Ln)
+        return Lstack.top().base + n;
+    else
+        return Ln;
+}
+
+/* IF ELSE */
+void JBC_IfBegin()
+{
+    // If have 2 Ln.
+    gotoM.pushL(2);
+    JBC << "\t\tifeq L" << gotoM.Lbase(0) << endl;
+}
+
+void JBC_IfEnd()
+{
+    JBC << "\tL" << gotoM.Lbase(0) << ":" << endl;
+    gotoM.popL();
+}
+    
+void JBC_ElseBegin()
+{
+    JBC << "\t\tgoto L" << gotoM.Lbase(1) << endl;
+    JBC << "\tL" << gotoM.Lbase(0) << ":" << endl;
+}
+
+void JBC_IfElseEnd()
+{
+    JBC << "\tL" << gotoM.Lbase(1) << ":" << endl;
+    gotoM.popL();
+}
+
+/* WHILE */
+void JBC_WhileBegin()
+{
+    // While have 2 Ln.
+    gotoM.pushL(2);
+    JBC << "\tL" << gotoM.Lbase(0) << ":" << endl;
+}
+
+void JBC_WhileEnd()
+{
+    JBC << "\t\tgoto L" << gotoM.Lbase(0) << ":" << endl;
+    JBC << "\tL" << gotoM.Lbase(1) << ":" << endl;
+    gotoM.popL();
+}
+
+void JBC_WhileCondJump()
+{
+    JBC << "\t\tifeq L" << gotoM.Lbase(1) << ":" << endl;;
+}
 
 /* Tool */
 

@@ -248,11 +248,11 @@ method_dec:
                     if (func->get_id_name() == "main") 
                     {
                         hasDefineMain = true;
-                        JBC_MainStart();
+                        JBC_MainBegin();
                     }
                     else
                     {
-                        JBC_FuncStart(*func);
+                        JBC_FuncBegin(*func);
                     }
 
                     // Add function arg type. use to check.
@@ -295,11 +295,11 @@ method_dec:
                     if (func->get_id_name() == "main") 
                     {
                         hasDefineMain = true;
-                        JBC_MainStart();
+                        JBC_MainBegin();
                     }
                     else
                     {
-                        JBC_FuncStart(*func);
+                        JBC_FuncBegin(*func);
                     }
                     
                     // Add func into current table.
@@ -448,7 +448,7 @@ simple_statement:
                 | PRINT
                 {
                     Trace("REDUCE < PRINT EXP >");
-                    JBC_PrintStart();
+                    JBC_PrintBegin();
                 } 
                 expression
                 {
@@ -457,7 +457,7 @@ simple_statement:
                 | PRINTLN 
                 {
                     Trace("REDUCE < PRINTLN EXP >");
-                    JBC_PrintStart();
+                    JBC_PrintBegin();
                 }
                 expression
                 {
@@ -1083,13 +1083,28 @@ condition:
                     {
                         yyerror("IF condition must be boolean");
                     }
+                    else
+                    {
+                        JBC_IfBegin();
+                    }
                 }
                 else
                 ;
 
 else:
-                block_or_simple_statement ELSE block_or_simple_statement
-                | block_or_simple_statement     /* with out else */
+                block_or_simple_statement ELSE 
+                {
+                    JBC_ElseBegin();
+                }
+                block_or_simple_statement
+                {
+                    JBC_IfElseEnd();
+                }
+                /* with out else */
+                | block_or_simple_statement
+                {
+                    JBC_IfEnd();
+                }
                 ;
 
 block_or_simple_statement:
@@ -1097,15 +1112,26 @@ block_or_simple_statement:
                 ;
 
 loop:
-                WHILE '(' expression ')'
+                WHILE 
+                {
+                    JBC_WhileBegin();
+                }
+                '(' expression ')'
                 {
                     Trace("REDUCE < WHILE (EXP) >");
-                    if ($3->get_data_type() != TYPE_BOOL)
+                    if ($4->get_data_type() != TYPE_BOOL)
                     {
                         yyerror("WHILE expression must be boolean");
                     }
+                    else
+                    {
+                        JBC_WhileCondJump();
+                    }
                 }
                 block_or_simple_statement
+                {
+                    JBC_WhileEnd();
+                }
                 | FOR '(' ID LT '-' CONST_INT TO CONST_INT ')'
                 {
                     Trace("REDUCE < FOR >");
@@ -1189,4 +1215,5 @@ int main(int argc, char* argv[])
         yyerror("Parsing error !");     /* syntax error */
     if (!error)
         cout << "Parsing succeed!" << endl;
+    JBC.close();
 }

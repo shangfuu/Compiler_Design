@@ -31,7 +31,7 @@ digit [0-9]
 letter [a-zA-Z]
 
 delim [,:.;\(\)\[\]\{\}]
-OP_arith [-%+*/]
+OP_arith [\-\%\+\*\/]
 OP_relat <|<=|>=|>|==|!=
 OP_logic "&&"|"||"|"!"
 assign =

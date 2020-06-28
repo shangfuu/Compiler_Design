@@ -6,6 +6,7 @@
 4. Change PRINT (EXP) and PRINTLN(EXP) to PRINT EXP and PRINTLN EXP.
 5. Add EXP : (EXP) into rules of EXP.
 6. Change all Bool value to Int.
+7. Found Lex OP_arith got too many conflict so change from [-%+*/] to [\-\%\+\*\/]
 
 # How to Run
 
