@@ -12,8 +12,9 @@ void JBC_End()
     JBC << "}" << endl;
 }
 
-// Variable 
+/* Variable */
 
+// Initial
 void JBC_GlobalVar (string id)
 {
     JBC << "\tfield static int " << id << endl;
@@ -24,6 +25,7 @@ void JBC_LocalVar(int index)
     JBC << "\t\tistore " << index << endl;
 }
 
+// = id
 void JBC_getGlobalVar(string id)
 {
     JBC << "\t\tgetstatic int " << filename << "." << id << endl;
@@ -34,6 +36,7 @@ void JBC_getLocalVar(int index)
     JBC << "\t\tiload " << index << endl;
 }
 
+// id =
 void  JBC_AssignGlobal(string id)
 {
     JBC << "\t\tputstatic type " << filename << "." << id << endl;
@@ -44,12 +47,18 @@ void JBC_AssignLocal(int index)
     JBC << "\t\tistore " << index << endl;
 }
 
+// Constant
 void JBC_PushInt(int value)
 {
     JBC << "\t\tsipush " << value << endl;
 }
 
-// OP
+void JBC_PushStr(string str)
+{
+    JBC << "\t\tldc \"" << str << "\"" << endl;
+}
+
+/* OP */
 
 void JBC_OP(char op)
 {
@@ -72,7 +81,7 @@ void JBC_RELOP()
 
 }
 
-// Print
+/* Print */
 
 void JBC_PrintStart()
 {
@@ -89,7 +98,7 @@ void JBC_PrintInt()
     JBC << "\t\tinvokevirtual void java.io.PrintStream.print(int)" << endl;
 }
 
-// Function
+/* Function */
 
 void JBC_MainStart()
 {
@@ -131,7 +140,18 @@ void JBC_FuncInvo(SymInfo id)
     JBC << ")" << endl;
 }
 
-// Tool
+void JBC_Return()
+{
+    JBC << "\t\treturn" << endl;
+}
+
+void JBC_IReturn()
+{
+    JBC << "\t\tireturn" << endl;
+}
+
+
+/* Tool */
 
 string typeToString(_Data_type type)
 {

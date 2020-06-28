@@ -30,6 +30,7 @@ void JBC_getLocalVar(int);
 
 // Constant Int
 void JBC_PushInt(int);
+void JBC_PushStr(string);
 
 // Arithmetic Operator
 void JBC_OP(char);
@@ -39,7 +40,7 @@ void JBC_RELOP();   // NOT DONE
 /* Statements */
 
 // Statements Assign Local
-void JBC_AssignLocal();
+void JBC_AssignLocal(int);
 // Statements Assign Global
 void JBC_AssignGlobal(string);
 
@@ -54,6 +55,8 @@ void JBC_FuncStart(SymInfo);
 void JBC_FuncEnd(SymInfo);
 void JBC_FuncInvo(SymInfo);
 
+void JBC_Return();
+void JBC_IReturn();
 
 /* Tool */
 string typeToString(_Data_type );

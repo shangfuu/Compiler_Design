@@ -2,6 +2,7 @@
 #define YACC_DEBUG 0
 #define Trace(t)    if(YACC_DEBUG){ cout << "Trace: " << t << endl; }
 
+#include <math.h>
 #include "symTable.h"
 #include "lex.yy.cpp"
 #include "JBC.h"
@@ -440,7 +441,13 @@ simple_statement:
                 | PRINTLN '(' expression ')'
                 | READ ID
                 | RETURN expression
+                {
+                    JBC_IReturn();
+                }
                 | RETURN
+                {
+                    JBC_Return();
+                }
                 ;
 
 expression:     
@@ -462,7 +469,40 @@ expression:
                     else
                     {
                         // Return ID data.
+                        Data *idData = id->get_data();
                         $$ = id->get_data();
+                        
+                        // JBC
+                        if (id->get_declare_type() == DEC_VAL)
+                        {
+                            if (id->get_data_type() == TYPE_INT)
+                            {
+                                int val = idData->get_int();
+                                JBC_PushInt(val);
+                            }
+                            else if (id->get_data_type() == TYPE_BOOL)
+                            {
+                                int val = idData->get_bool() ? 1 : 0;
+                                JBC_PushInt(val);
+                            }
+                            else if (id->get_data_type() == TYPE_STRING)
+                            {
+                                JBC_PushStr(*(idData->get_string()));
+                            }
+                        }
+                        else if (id->get_declare_type() == DEC_VAR)
+                        {
+                            // global
+                            if (id->isGlobal())
+                            {
+                                JBC_getGlobalVar(id->get_id_name());
+                            }
+                            // local
+                            else
+                            {
+                                JBC_getLocalVar(id->stackID);
+                            }
+                        }
                     }
                 }
                 | ID '[' expression ']'
@@ -499,6 +539,7 @@ expression:
                     {
                         Data *d = new Data(TYPE_INT, $2->get_int() * -1);
                         $$ = d;
+                        JBC_OP('u');
                     }
                     else if ($2->get_data_type() == TYPE_FLOAT)
                     {
@@ -523,6 +564,7 @@ expression:
                         {
                             Data *d = new Data(TYPE_INT, $1->get_int() * $3->get_int());
                             $$ = d;
+                            JBC_OP('*');
                         }
                         else if ($1->get_data_type() == TYPE_FLOAT)
                         {
@@ -548,6 +590,7 @@ expression:
                         {
                             Data *d = new Data(TYPE_INT, $1->get_int() / $3->get_int());
                             $$ = d;
+                            JBC_OP('/');
                         }
                         else if ($1->get_data_type() == TYPE_FLOAT)
                         {
@@ -573,6 +616,7 @@ expression:
                         {
                             Data *d = new Data(TYPE_INT, $1->get_int() + $3->get_int());
                             $$ = d;
+                            JBC_OP('+');
                         }
                         else if ($1->get_data_type() == TYPE_FLOAT)
                         {
@@ -598,6 +642,7 @@ expression:
                         {
                             Data *d = new Data(TYPE_INT, $1->get_int() - $3->get_int());
                             $$ = d;
+                            JBC_OP('-');
                         }
                         else if ($1->get_data_type() == TYPE_FLOAT)
                         {
@@ -607,6 +652,32 @@ expression:
                         else
                         {
                             yyerror("TYPE ERROR in exp - exp");
+                        }
+                    }
+                }
+                | expression '%' expression
+                {
+                    Trace("REDUCE <EXP % EXP>");
+                    // Only calculate the type INT and FLOAT
+                    if ($1->get_data_type() != $3->get_data_type())
+                    {
+                        yyerror("Types of the left/right-hand-side must be matched.");
+                    }
+                    else {
+                        if ($1->get_data_type() == TYPE_INT)
+                        {
+                            Data *d = new Data(TYPE_INT, $1->get_int() % $3->get_int());
+                            $$ = d;
+                            JBC_OP('%');
+                        }
+                        else if ($1->get_data_type() == TYPE_FLOAT)
+                        {
+                            Data *d = new Data(TYPE_FLOAT, fmod($1->get_float(), $3->get_float()));
+                            $$ = d;
+                        }
+                        else
+                        {
+                            yyerror("TYPE ERROR in exp % exp");
                         }
                     }
                 }
@@ -807,6 +878,7 @@ expression:
                         Data *d = new Data(TYPE_BOOL, false);
                         d->set_value(!$2->get_bool());
                         $$ = d;
+                        JBC_OP('!');
                     }
                     else
                     {
@@ -827,6 +899,7 @@ expression:
                         {
                             d->set_value($1->get_bool() && $3->get_bool());
                             $$ = d;
+                            JBC_OP('&');
                         }
                         else
                         {
@@ -848,6 +921,7 @@ expression:
                         {
                             d->set_value($1->get_bool() || $3->get_bool());
                             $$ = d;
+                            JBC_OP('|');
                         }
                         else
                         {
@@ -862,6 +936,7 @@ literal_const:
                 {
                     Data *d = new Data(TYPE_INT, $1);
                     $$ = d;
+                    JBC_PushInt($1);
                 }
                 | CONST_REAL
                 {
@@ -877,11 +952,13 @@ literal_const:
                 {
                     Data *d = new Data(TYPE_STRING, $1);
                     $$ = d;
+                    JBC_PushStr(*$1);
                 }
                 | CONST_BOOL
                 {
                     Data *d = new Data(TYPE_BOOL, $1);
                     $$ = d;
+                    JBC_PushInt($1? 1:0);
                 }
                 ;
 
