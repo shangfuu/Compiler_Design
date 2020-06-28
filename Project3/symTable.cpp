@@ -103,6 +103,8 @@ SymInfo::SymInfo()
     id_name = "";
     declare_type = DEC_ERROR;
     return_type = TYPE_NONE;
+    global = false;
+    stackID = -1;
 }
 // Variable
 
@@ -110,6 +112,8 @@ SymInfo::SymInfo(string id, _Declare_type dec)
 {
     id_name = id;
     declare_type = dec;
+    global = false;
+    stackID = -1;
     // func
     return_type = TYPE_NONE;
 }
@@ -119,6 +123,8 @@ SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type)
     id_name = id;
     declare_type = dec;
     var_data.set_data_type(type);
+    global = false;
+    stackID = -1;
     // func
     return_type = TYPE_NONE;
 }
@@ -128,6 +134,8 @@ SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, Data dataValue)
     id_name = id;
     declare_type = dec;
     var_data = dataValue;
+    global = false;
+    stackID = -1;
     // func
     return_type = TYPE_NONE;
 }
@@ -137,6 +145,8 @@ SymInfo::SymInfo(string id, _Declare_type dec, Data dataValue)
     id_name = id;
     declare_type = dec;
     var_data = dataValue;
+    global = false;
+    stackID = -1;
     // func
     return_type = TYPE_NONE;
 }
@@ -147,6 +157,8 @@ SymInfo::SymInfo(string id, _Declare_type dec, _Data_type type, int length)
     id_name = id;
     declare_type = dec;
     array_num = length;
+    global = false;
+    stackID = -1;
 
     array_data = new Data[length];
     for (int i = 0 ; i < length; i++)
@@ -199,6 +211,12 @@ _Data_type SymInfo::get_return_type()
 {
     return return_type;
 }
+
+vector<_Data_type> SymInfo::get_arg()
+{
+    return args_types;
+}
+
 // Common
 
 string SymInfo::get_id_name()
@@ -240,6 +258,16 @@ void SymInfo::test()
 {
     cout << "ID name: " << get_id_name() << endl;
     cout << "Declare type: " << get_declare_type() << endl;
+}
+// Global Check
+bool SymInfo::isGlobal()
+{
+    return global;
+}
+
+void SymInfo::set_global() 
+{ 
+    global = true; 
 }
 
 /* Single Symbol Table */
@@ -311,6 +339,10 @@ SymbolTables::~SymbolTables()
 
 int SymbolTables::insert(SymInfo* entry)
 {
+    if (top == 0)
+    {
+        entry->set_global();
+    }
     return tables[top].insert(entry);
 }
 
@@ -339,6 +371,14 @@ SymInfo* SymbolTables::look_up(string id_name)
         }
     }
     return NULL;
+}
+
+bool SymbolTables::isGlobalTable()
+{
+    if (top == 0)
+        return true;
+    else
+        return false;
 }
 
 void SymbolTables::dump()

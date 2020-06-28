@@ -4,17 +4,26 @@
 
 #include "symTable.h"
 #include "lex.yy.cpp"
-
+#include "JBC.h"
 
 // Global Symbol Tables
 SymbolTables symbol_tables;
 
 void yyerror(string);
 
+// Flags
 bool hasDefineMain = false;
+bool error = false;
 
-// Insert ID in current table (tables[top]).
-void insertTableEntry(SymInfo*);
+// 
+string filename;
+ofstream JBC;
+
+// Variable stack index
+int stackVarID;
+
+// Insert ID in current table (tables[top]), return 1 if succedd.
+int insertTableEntry(SymInfo*);
 %}
 
 /* Can be used in yylval, use in yacc $, non-terminal type */
@@ -68,8 +77,8 @@ void insertTableEntry(SymInfo*);
 %nonassoc UMINUS
 
 /* Return type of NON-TERMINAL */
-%type <dataType> type return_type function_invocation
-%type <dataValue> expression literal_const
+%type <dataType> type return_type
+%type <dataValue> expression literal_const function_invocation
 %type <func_arg> arg
 %type <func_args> formal_args
 %type <func_call> comma_separated_expression
@@ -83,6 +92,8 @@ program:
                     Trace("REDUCE < PROGRAM >\n");
                     // Insert ID in current table.
                     insertTableEntry(new SymInfo(*$2, DEC_OBJECT));
+                    // Generate Java byte Code
+                    JBC_Init();
                 }
                 '{' var_const_decs method_decs '}'
                 {
@@ -93,6 +104,7 @@ program:
                     }
                     // End block then pop current table.
                     symbol_tables.pop_table();
+                    JBC_End();
                 }
                 ;
 
@@ -112,7 +124,10 @@ const_dec:
                     {
                         yyerror("Declartion Type Inconsistent");
                     }
-                    insertTableEntry(new SymInfo(*$2, DEC_VAL, $4, *$6));
+                    else
+                    {
+                        insertTableEntry(new SymInfo(*$2, DEC_VAL, $4, *$6));
+                    }
                 }
                 | VAL ID '=' expression
                 {
@@ -127,15 +142,57 @@ var_dec:
                     {
                         yyerror("Declartion Type Inconsistent");
                     }
-                    insertTableEntry(new SymInfo(*$2, DEC_VAR, $4, *$6));
+                    else
+                    {
+                        if ( insertTableEntry(new SymInfo(*$2, DEC_VAR, $4, *$6)) )
+                        {
+                            if (symbol_tables.isGlobalTable())
+                            {
+                                JBC_GlobalVar(*$2);
+                                JBC_AssignGlobal(*$2);
+                            }
+                            else 
+                            {
+                                SymInfo *id = symbol_tables.look_up(*$2);
+                                id->stackID = stackVarID;
+                                JBC_LocalVar(stackVarID++);
+                            }
+                        }
+                    }
                 }
                 | VAR ID ':' type
                 {
-                    insertTableEntry(new SymInfo(*$2, DEC_VAR, $4));
+                    if (insertTableEntry(new SymInfo(*$2, DEC_VAR, $4)))
+                    {
+                        if (symbol_tables.isGlobalTable())
+                        {
+                            JBC_GlobalVar(*$2);
+                        }
+                        else 
+                        {
+                            JBC_PushInt(0);
+                            SymInfo *id = symbol_tables.look_up(*$2);
+                            id->stackID = stackVarID;
+                            JBC_LocalVar(stackVarID++);
+                        }
+                    }
                 }
                 | VAR ID '=' expression
                 {
-                    insertTableEntry(new SymInfo(*$2, DEC_VAR, *$4));
+                    if (insertTableEntry(new SymInfo(*$2, DEC_VAR, *$4)))
+                    {
+                        if (symbol_tables.isGlobalTable())
+                        {
+                            JBC_GlobalVar(*$2);
+                            JBC_AssignGlobal(*$2);
+                        }
+                        else 
+                        {
+                            SymInfo *id = symbol_tables.look_up(*$2);
+                            id->stackID = stackVarID;
+                            JBC_LocalVar(stackVarID++);
+                        }
+                    }
                 }
                 | VAR ID ':' type '[' CONST_INT ']'   /* Array */
                 {
@@ -182,17 +239,27 @@ method_dec:
                     Trace("REDUCE < METHOD () >");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
+                    func->set_return_type($6);
+                    // Zero out variable stack
+                    stackVarID = 0;
+                    
                     // Check if main declare
-                    if (func->get_id_name() == "main") {
+                    if (func->get_id_name() == "main") 
+                    {
                         hasDefineMain = true;
+                        JBC_MainStart();
                     }
+                    else
+                    {
+                        JBC_FuncStart(*func);
+                    }
+
                     // Add function arg type. use to check.
                     for(int i = 0 ; i < $4->size(); i++)
                     {
                         func->add_arg_type((*$4)[i]->get_data_type());
                     }
-                    func->set_return_type($6);
-
+                    
                     // Add func into current table.
                     insertTableEntry(func);
 
@@ -206,6 +273,9 @@ method_dec:
                 }
                 '{' var_const_decs statements '}'
                 {
+                    SymInfo *func = symbol_tables.look_up(*$2);
+                    JBC_FuncEnd(*func);
+                    
                     symbol_tables.dump();
                     // End block then pop current table.
                     symbol_tables.pop_table();
@@ -216,13 +286,21 @@ method_dec:
                     Trace("REDUCE < METHOD >");
                     // New a function type STEI.
                     SymInfo* func = new SymInfo(*$2, DEC_DEF);
+                    func->set_return_type($3);
+                    // Zero out variable stack
+                    stackVarID = 0;
 
                     // Check if main declare
-                    if (func->get_id_name() == "main") {
+                    if (func->get_id_name() == "main") 
+                    {
                         hasDefineMain = true;
+                        JBC_MainStart();
                     }
-
-                    func->set_return_type($3);
+                    else
+                    {
+                        JBC_FuncStart(*func);
+                    }
+                    
                     // Add func into current table.
                     insertTableEntry(func);
 
@@ -231,6 +309,9 @@ method_dec:
                 }
                 '{' var_const_decs statements '}'
                 {
+                    SymInfo *func = symbol_tables.look_up(*$2);
+                    JBC_FuncEnd(*func);
+
                     symbol_tables.dump();
                     // End block then pop current table.
                     symbol_tables.pop_table();
@@ -369,12 +450,6 @@ expression:
                     $$ = $1;
                 }
                 | function_invocation
-                {
-                    // Only get function type
-                    Data* d = new Data();
-                    d->set_data_type($1);
-                    $$ = d;
-                }
                 | ID
                 {
                     Trace("REDUCE < ID >");
@@ -822,19 +897,24 @@ function_invocation:
                     else
                     {
                         if (id->get_declare_type() != DEC_DEF)
-                    {
-                        yyerror(string("ID " + *$1 +" function invocation must be declare as DEF"));
-                    }
-                    // Check if comma_separated_exp type is equal to function args
-                    if (id->check_arg_match($3) == false)
-                    {
-                        yyerror("Function arg type mismatch");
-                    }
-                    if (id->get_return_type() == TYPE_NONE)
-                    {
-                        yyerror(string("ID " + *$1 + " function without return"));
-                    }
-                    $$ = id->get_return_type();
+                        {
+                            yyerror(string("ID " + *$1 +" function invocation must be declare as DEF"));
+                        }
+                        // Check if comma_separated_exp type is equal to function args
+                        else if (id->check_arg_match($3) == false)
+                        {
+                            yyerror("Function arg type mismatch");
+                        }
+                        else if (id->get_return_type() == TYPE_NONE)
+                        {
+                            yyerror(string("ID " + *$1 + " function without return"));
+                        }
+                        else
+                        {
+                            $$ = new Data();
+                            $$->set_data_type(id->get_return_type());
+                            JBC_FuncInvo(*id);
+                        }
                     }
                 }
                 ;
@@ -939,20 +1019,23 @@ procedure_invocation:
 
 %%
 
-void insertTableEntry(SymInfo *id)
+int insertTableEntry(SymInfo *id)
 {
     if (symbol_tables.insert(id) == -1)
     {
         yyerror("Insert table entry faild: " + id->get_id_name());
+        return -1;
     }
+    return 1;
 }
 
 void yyerror(string msg)
 {
     cout << "yyerror: " << msg << endl;
+    error = true;
 }
 
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     /* open the source program file */
     if (argc == 1) {
@@ -966,10 +1049,24 @@ main(int argc, char* argv[])
         exit(1);
     }
     
+    if (argc != 1)
+    {
+        filename = string(argv[1]);
+        int dot = filename.find(".");
+        filename = filename.substr(0, dot);
+        JBC.open(filename + ".jsam");
+    }
+
+    // JBC file not opened
+    if (!JBC)
+    {
+        cout << "Java Byte Code open error" << endl;
+        exit(1);
+    }
 
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
-    else
+    if (!error)
         cout << "Parsing succeed!" << endl;
 }

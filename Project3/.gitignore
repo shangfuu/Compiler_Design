@@ -7,3 +7,10 @@ lex.yy.*
 
 # yacc
 y.tab.*
+
+# java
+*.jasm
+*.class
+
+# compiler
+compiler

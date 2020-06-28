@@ -97,6 +97,7 @@ public:
     
     // Check if modified.
     bool isModified();
+    
 };
 
 
@@ -126,6 +127,9 @@ private:
     // Store args types, use to check function call.
     vector<_Data_type> args_types;
 
+    // Check if global variable
+    bool global;
+
 public:
     SymInfo();
     // Used like:  object ID, def ID
@@ -148,6 +152,7 @@ public:
     void set_return_type(_Data_type);
     bool check_arg_match(vector<Data*>*);
     _Data_type get_return_type();
+    vector<_Data_type> get_arg();
 
     /* Common Function */
     string get_id_name();
@@ -162,8 +167,14 @@ public:
     Data *get_data();
     Data *get_array_data(int);
 
-
     void test();
+
+    // Set Global
+    void set_global();
+    // Check if global
+    bool isGlobal();
+    // Variable Stack
+    int stackID;
 };
 
 
@@ -213,6 +224,8 @@ public:
     SymInfo* look_up(string);
     // Dump all tables and their entry
     void dump();
+    // Check if Global table
+    bool isGlobalTable();
 };
 
 string data_type_to_string(_Data_type);
