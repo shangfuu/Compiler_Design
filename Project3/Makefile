@@ -8,6 +8,12 @@ SYM_TABLE_CPP = symTable.cpp
 JBC_H = JBC.h
 JBC_CPP = JBC.cpp
 
+ifeq ($(shell uname -s), Darwin)
+	javaa := ./javaa_mac
+else
+	javaa := ./javaa
+endif
+
 all: compile
 
 compile: y.tab.cpp lex.yy.cpp $(SYM_TABLE_H) $(SYM_TABLE_CPP) $(JBC_H) $(JBC_CPP)
@@ -18,8 +24,6 @@ y.tab.cpp: $(YACC_FILE)
 
 lex.yy.cpp: $(LEX_FILE) y.tab.hpp
 	lex -o lex.yy.cpp $(LEX_FILE)
-
-
 
 PHONY: clean run
 
@@ -35,6 +39,6 @@ clean:
 
 run: compiler
 	./compiler $(file).scala
-	./javaa_mac $(file).jasm
+	$(javaa) $(file).jasm
 	java $(file)
 
