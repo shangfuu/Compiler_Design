@@ -29,7 +29,7 @@ clean:
 	-rm lex.yy.*
 	-rm compiler
 	-rm *.jasm
-	-rn *.class
+	-rm *.class
 	-rm test_files/*.jasm
 	-rm test_files/*.class
 
