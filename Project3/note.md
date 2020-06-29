@@ -9,7 +9,7 @@
 7. Change Lex OP_arith from [-%+*/] to [\-\%\+\*\/] to avoid problem happen.
 8. arg are not immutable anymore, they are all VAR
 9. rewrite function declaretion
-10. change grammar
+10. change grammar method and block
 
 # How to Run
 

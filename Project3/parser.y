@@ -278,7 +278,7 @@ method_dec:
                     //     insertTableEntry((*$5)[i]);
                     // }
                 }
-                '{' var_const_decs_statements '}'
+                block
                 {
                     SymInfo *func = symbol_tables.look_up(*$2);
                     JBC_FuncEnd(*func);
@@ -315,7 +315,7 @@ method_dec:
                     /* Create a new child table. */
                     symbol_tables.add_table();
                 }
-                '{' var_const_decs_statements '}'
+                block
                 {
                     SymInfo *func = symbol_tables.look_up(*$2);
                     JBC_FuncEnd(*func);
