@@ -31,6 +31,16 @@ object example {
     {
       print c
     }
+    var d: int
+    var n = 1
+
+    while (n <= 10)
+      n = n + 1
+    
+    println(n)
+    // n = 0
+    // while (n > -5)
+    //   n = n - 1
 
     println ("Hello World")
   }

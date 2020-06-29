@@ -2,7 +2,7 @@
 #define YACC_DEBUG 0
 #define Trace(t)    if(YACC_DEBUG){ cout << "Trace: " << t << endl; }
 
-#include <math.h>
+// #include <math.h>
 #include "symTable.h"
 #include "lex.yy.cpp"
 #include "JBC.h"
@@ -278,7 +278,7 @@ method_dec:
                     //     insertTableEntry((*$5)[i]);
                     // }
                 }
-                '{' var_const_decs statements '}'
+                '{' var_const_decs_statements '}'
                 {
                     SymInfo *func = symbol_tables.look_up(*$2);
                     JBC_FuncEnd(*func);
@@ -315,7 +315,7 @@ method_dec:
                     /* Create a new child table. */
                     symbol_tables.add_table();
                 }
-                '{' var_const_decs statements '}'
+                '{' var_const_decs_statements '}'
                 {
                     SymInfo *func = symbol_tables.look_up(*$2);
                     JBC_FuncEnd(*func);
@@ -324,6 +324,15 @@ method_dec:
                     // End block then pop current table.
                     symbol_tables.pop_table();
                 }
+                ;
+
+var_const_decs_statements:
+                var_const_decs_statement var_const_decs_statements
+                |
+                ;
+
+var_const_decs_statement:
+                var_const_dec | statement
                 ;
 
 return_type:    
@@ -607,7 +616,7 @@ expression:
                         yyerror("TYPE ERROR in - exp");
                     }
                 }
-                | expression '%' expression
+                /* | expression '%' expression
                 {
                     Trace("REDUCE <EXP % EXP>");
                     // Only calculate the type INT and FLOAT
@@ -632,7 +641,7 @@ expression:
                             yyerror("TYPE ERROR in exp % exp");
                         }
                     }
-                }
+                } */
                 | expression '*' expression
                 {
                     Trace("REDUCE < EXP * EXP >");

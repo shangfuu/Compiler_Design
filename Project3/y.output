@@ -1,0 +1,3033 @@
+Terminals which are not used
+
+   BREAK
+   CASE
+   CLASS
+   CONTINUE
+   DO
+   EXIT
+   NIL
+   REPEAT
+   TYPE
+
+
+State 50 conflicts: 1 shift/reduce
+State 53 conflicts: 1 shift/reduce
+State 78 conflicts: 1 shift/reduce
+State 79 conflicts: 1 shift/reduce
+State 80 conflicts: 1 shift/reduce
+State 81 conflicts: 1 shift/reduce
+State 82 conflicts: 1 shift/reduce
+State 83 conflicts: 1 shift/reduce
+State 84 conflicts: 1 shift/reduce
+State 85 conflicts: 1 shift/reduce
+State 86 conflicts: 1 shift/reduce
+State 87 conflicts: 1 shift/reduce
+State 88 conflicts: 1 shift/reduce
+State 89 conflicts: 1 shift/reduce
+State 90 conflicts: 13 shift/reduce
+State 108 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 @1: /* empty */
+
+    2 program: OBJECT ID @1 '{' var_const_decs method_decs '}'
+
+    3 var_const_decs: var_const_dec var_const_decs
+    4               | /* empty */
+
+    5 var_const_dec: const_dec
+    6              | var_dec
+
+    7 const_dec: VAL ID ':' type '=' expression
+    8          | VAL ID '=' expression
+
+    9 var_dec: VAR ID ':' type '=' expression
+   10        | VAR ID ':' type
+   11        | VAR ID '=' expression
+   12        | VAR ID ':' type '[' CONST_INT ']'
+
+   13 type: INT
+   14     | FLOAT
+   15     | CHAR
+   16     | STRING
+   17     | BOOLEAN
+
+   18 method_decs: method_dec method_decs
+   19            | method_dec
+
+   20 @2: /* empty */
+
+   21 @3: /* empty */
+
+   22 method_dec: DEF ID @2 '(' formal_args ')' return_type @3 '{' var_const_decs_statements '}'
+
+   23 @4: /* empty */
+
+   24 method_dec: DEF ID return_type @4 '{' var_const_decs_statements '}'
+
+   25 var_const_decs_statements: var_const_decs_statement var_const_decs_statements
+   26                          | /* empty */
+
+   27 var_const_decs_statement: var_const_dec
+   28                         | statement
+
+   29 return_type: ':' type
+   30            | /* empty */
+
+   31 formal_args: arg
+   32            | arg ',' formal_args
+   33            | /* empty */
+
+   34 arg: ID ':' type
+
+   35 statements: statement statements
+   36           | /* empty */
+
+   37 statement: simple_statement
+   38          | block
+   39          | condition
+   40          | loop
+   41          | procedure_invocation
+
+   42 simple_statement: ID '=' expression
+   43                 | ID '[' expression ']' '=' expression
+
+   44 @5: /* empty */
+
+   45 simple_statement: PRINT @5 expression
+
+   46 @6: /* empty */
+
+   47 simple_statement: PRINTLN @6 expression
+   48                 | READ ID
+   49                 | RETURN expression
+   50                 | RETURN
+
+   51 expression: '(' expression ')'
+   52           | literal_const
+   53           | function_invocation
+   54           | ID
+   55           | ID '[' expression ']'
+   56           | '-' expression
+   57           | expression '%' expression
+   58           | expression '*' expression
+   59           | expression '/' expression
+   60           | expression '+' expression
+   61           | expression '-' expression
+   62           | expression LT expression
+   63           | expression LE expression
+   64           | expression GT expression
+   65           | expression GE expression
+   66           | expression EE expression
+   67           | expression NE expression
+   68           | NOT expression
+   69           | expression AND expression
+   70           | expression OR expression
+
+   71 literal_const: CONST_INT
+   72              | CONST_REAL
+   73              | CONST_CHAR
+   74              | CONST_STRING
+   75              | CONST_BOOL
+
+   76 function_invocation: ID '(' comma_separated_expression ')'
+
+   77 comma_separated_expression: expression
+   78                           | expression ',' comma_separated_expression
+   79                           | /* empty */
+
+   80 @7: /* empty */
+
+   81 block: '{' @7 var_const_decs one_or_more_statements '}'
+
+   82 one_or_more_statements: statement statements
+
+   83 @8: /* empty */
+
+   84 condition: IF '(' expression ')' @8 else
+
+   85 @9: /* empty */
+
+   86 else: block_or_simple_statement ELSE @9 block_or_simple_statement
+   87     | block_or_simple_statement
+
+   88 block_or_simple_statement: block
+   89                          | simple_statement
+
+   90 @10: /* empty */
+
+   91 @11: /* empty */
+
+   92 loop: WHILE @10 '(' expression ')' @11 block_or_simple_statement
+
+   93 @12: /* empty */
+
+   94 loop: FOR '(' ID LT '-' CONST_INT TO CONST_INT ')' @12 block_or_simple_statement
+
+   95 procedure_invocation: ID
+   96                     | ID '(' comma_separated_expression ')'
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'%' (37) 57
+'(' (40) 22 51 76 84 92 94 96
+')' (41) 22 51 76 84 92 94 96
+'*' (42) 58
+'+' (43) 60
+',' (44) 32 78
+'-' (45) 56 61 94
+'/' (47) 59
+':' (58) 7 9 10 12 29 34
+'=' (61) 7 8 9 11 42 43
+'[' (91) 12 43 55
+']' (93) 12 43 55
+'{' (123) 2 22 24 81
+'}' (125) 2 22 24 81
+error (256)
+BOOLEAN (258) 17
+BREAK (259)
+CHAR (260) 15
+CASE (261)
+CLASS (262)
+CONTINUE (263)
+DEF (264) 22 24
+DO (265)
+ELSE (266) 86
+EXIT (267)
+FLOAT (268) 14
+FOR (269) 94
+IF (270) 84
+INT (271) 13
+NIL (272)
+OBJECT (273) 2
+PRINT (274) 45
+PRINTLN (275) 47
+REPEAT (276)
+RETURN (277) 49 50
+STRING (278) 16
+TO (279) 94
+TYPE (280)
+VAL (281) 7 8
+VAR (282) 9 10 11 12
+WHILE (283) 92
+READ (284) 48
+LT (285) 62 94
+LE (286) 63
+GT (287) 64
+GE (288) 65
+NE (289) 67
+EE (290) 66
+AND (291) 69
+OR (292) 70
+NOT (293) 68
+ID (294) 2 7 8 9 10 11 12 22 24 34 42 43 48 54 55 76 94 95 96
+CONST_BOOL (295) 75
+CONST_INT (296) 12 71 94
+CONST_REAL (297) 72
+CONST_STRING (298) 74
+CONST_CHAR (299) 73
+UMINUS (300)
+
+
+Nonterminals, with rules where they appear
+
+$accept (60)
+    on left: 0
+program (61)
+    on left: 2, on right: 0
+@1 (62)
+    on left: 1, on right: 2
+var_const_decs (63)
+    on left: 3 4, on right: 2 3 81
+var_const_dec (64)
+    on left: 5 6, on right: 3 27
+const_dec (65)
+    on left: 7 8, on right: 5
+var_dec (66)
+    on left: 9 10 11 12, on right: 6
+type (67)
+    on left: 13 14 15 16 17, on right: 7 9 10 12 29 34
+method_decs (68)
+    on left: 18 19, on right: 2 18
+method_dec (69)
+    on left: 22 24, on right: 18 19
+@2 (70)
+    on left: 20, on right: 22
+@3 (71)
+    on left: 21, on right: 22
+@4 (72)
+    on left: 23, on right: 24
+var_const_decs_statements (73)
+    on left: 25 26, on right: 22 24 25
+var_const_decs_statement (74)
+    on left: 27 28, on right: 25
+return_type (75)
+    on left: 29 30, on right: 22 24
+formal_args (76)
+    on left: 31 32 33, on right: 22 32
+arg (77)
+    on left: 34, on right: 31 32
+statements (78)
+    on left: 35 36, on right: 35 82
+statement (79)
+    on left: 37 38 39 40 41, on right: 28 35 82
+simple_statement (80)
+    on left: 42 43 45 47 48 49 50, on right: 37 89
+@5 (81)
+    on left: 44, on right: 45
+@6 (82)
+    on left: 46, on right: 47
+expression (83)
+    on left: 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68
+    69 70, on right: 7 8 9 11 42 43 45 47 49 51 55 56 57 58 59 60 61
+    62 63 64 65 66 67 68 69 70 77 78 84 92
+literal_const (84)
+    on left: 71 72 73 74 75, on right: 52
+function_invocation (85)
+    on left: 76, on right: 53
+comma_separated_expression (86)
+    on left: 77 78 79, on right: 76 78 96
+block (87)
+    on left: 81, on right: 38 88
+@7 (88)
+    on left: 80, on right: 81
+one_or_more_statements (89)
+    on left: 82, on right: 81
+condition (90)
+    on left: 84, on right: 39
+@8 (91)
+    on left: 83, on right: 84
+else (92)
+    on left: 86 87, on right: 84
+@9 (93)
+    on left: 85, on right: 86
+block_or_simple_statement (94)
+    on left: 88 89, on right: 86 87 92 94
+loop (95)
+    on left: 92 94, on right: 40
+@10 (96)
+    on left: 90, on right: 92
+@11 (97)
+    on left: 91, on right: 92
+@12 (98)
+    on left: 93, on right: 94
+procedure_invocation (99)
+    on left: 95 96, on right: 41
+
+
+state 0
+
+    0 $accept: . program $end
+
+    OBJECT  shift, and go to state 1
+
+    program  go to state 2
+
+
+state 1
+
+    2 program: OBJECT . ID @1 '{' var_const_decs method_decs '}'
+
+    ID  shift, and go to state 3
+
+
+state 2
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 4
+
+
+state 3
+
+    2 program: OBJECT ID . @1 '{' var_const_decs method_decs '}'
+
+    $default  reduce using rule 1 (@1)
+
+    @1  go to state 5
+
+
+state 4
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+state 5
+
+    2 program: OBJECT ID @1 . '{' var_const_decs method_decs '}'
+
+    '{'  shift, and go to state 6
+
+
+state 6
+
+    2 program: OBJECT ID @1 '{' . var_const_decs method_decs '}'
+
+    VAL  shift, and go to state 7
+    VAR  shift, and go to state 8
+
+    $default  reduce using rule 4 (var_const_decs)
+
+    var_const_decs  go to state 9
+    var_const_dec   go to state 10
+    const_dec       go to state 11
+    var_dec         go to state 12
+
+
+state 7
+
+    7 const_dec: VAL . ID ':' type '=' expression
+    8          | VAL . ID '=' expression
+
+    ID  shift, and go to state 13
+
+
+state 8
+
+    9 var_dec: VAR . ID ':' type '=' expression
+   10        | VAR . ID ':' type
+   11        | VAR . ID '=' expression
+   12        | VAR . ID ':' type '[' CONST_INT ']'
+
+    ID  shift, and go to state 14
+
+
+state 9
+
+    2 program: OBJECT ID @1 '{' var_const_decs . method_decs '}'
+
+    DEF  shift, and go to state 15
+
+    method_decs  go to state 16
+    method_dec   go to state 17
+
+
+state 10
+
+    3 var_const_decs: var_const_dec . var_const_decs
+
+    VAL  shift, and go to state 7
+    VAR  shift, and go to state 8
+
+    $default  reduce using rule 4 (var_const_decs)
+
+    var_const_decs  go to state 18
+    var_const_dec   go to state 10
+    const_dec       go to state 11
+    var_dec         go to state 12
+
+
+state 11
+
+    5 var_const_dec: const_dec .
+
+    $default  reduce using rule 5 (var_const_dec)
+
+
+state 12
+
+    6 var_const_dec: var_dec .
+
+    $default  reduce using rule 6 (var_const_dec)
+
+
+state 13
+
+    7 const_dec: VAL ID . ':' type '=' expression
+    8          | VAL ID . '=' expression
+
+    ':'  shift, and go to state 19
+    '='  shift, and go to state 20
+
+
+state 14
+
+    9 var_dec: VAR ID . ':' type '=' expression
+   10        | VAR ID . ':' type
+   11        | VAR ID . '=' expression
+   12        | VAR ID . ':' type '[' CONST_INT ']'
+
+    ':'  shift, and go to state 21
+    '='  shift, and go to state 22
+
+
+state 15
+
+   22 method_dec: DEF . ID @2 '(' formal_args ')' return_type @3 '{' var_const_decs_statements '}'
+   24           | DEF . ID return_type @4 '{' var_const_decs_statements '}'
+
+    ID  shift, and go to state 23
+
+
+state 16
+
+    2 program: OBJECT ID @1 '{' var_const_decs method_decs . '}'
+
+    '}'  shift, and go to state 24
+
+
+state 17
+
+   18 method_decs: method_dec . method_decs
+   19            | method_dec .
+
+    DEF  shift, and go to state 15
+
+    $default  reduce using rule 19 (method_decs)
+
+    method_decs  go to state 25
+    method_dec   go to state 17
+
+
+state 18
+
+    3 var_const_decs: var_const_dec var_const_decs .
+
+    $default  reduce using rule 3 (var_const_decs)
+
+
+state 19
+
+    7 const_dec: VAL ID ':' . type '=' expression
+
+    BOOLEAN  shift, and go to state 26
+    CHAR     shift, and go to state 27
+    FLOAT    shift, and go to state 28
+    INT      shift, and go to state 29
+    STRING   shift, and go to state 30
+
+    type  go to state 31
+
+
+state 20
+
+    8 const_dec: VAL ID '=' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 41
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 21
+
+    9 var_dec: VAR ID ':' . type '=' expression
+   10        | VAR ID ':' . type
+   12        | VAR ID ':' . type '[' CONST_INT ']'
+
+    BOOLEAN  shift, and go to state 26
+    CHAR     shift, and go to state 27
+    FLOAT    shift, and go to state 28
+    INT      shift, and go to state 29
+    STRING   shift, and go to state 30
+
+    type  go to state 44
+
+
+state 22
+
+   11 var_dec: VAR ID '=' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 45
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 23
+
+   22 method_dec: DEF ID . @2 '(' formal_args ')' return_type @3 '{' var_const_decs_statements '}'
+   24           | DEF ID . return_type @4 '{' var_const_decs_statements '}'
+
+    ':'  shift, and go to state 46
+
+    '{'       reduce using rule 30 (return_type)
+    $default  reduce using rule 20 (@2)
+
+    @2           go to state 47
+    return_type  go to state 48
+
+
+state 24
+
+    2 program: OBJECT ID @1 '{' var_const_decs method_decs '}' .
+
+    $default  reduce using rule 2 (program)
+
+
+state 25
+
+   18 method_decs: method_dec method_decs .
+
+    $default  reduce using rule 18 (method_decs)
+
+
+state 26
+
+   17 type: BOOLEAN .
+
+    $default  reduce using rule 17 (type)
+
+
+state 27
+
+   15 type: CHAR .
+
+    $default  reduce using rule 15 (type)
+
+
+state 28
+
+   14 type: FLOAT .
+
+    $default  reduce using rule 14 (type)
+
+
+state 29
+
+   13 type: INT .
+
+    $default  reduce using rule 13 (type)
+
+
+state 30
+
+   16 type: STRING .
+
+    $default  reduce using rule 16 (type)
+
+
+state 31
+
+    7 const_dec: VAL ID ':' type . '=' expression
+
+    '='  shift, and go to state 49
+
+
+state 32
+
+   68 expression: NOT . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 50
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 33
+
+   54 expression: ID .
+   55           | ID . '[' expression ']'
+   76 function_invocation: ID . '(' comma_separated_expression ')'
+
+    '['  shift, and go to state 51
+    '('  shift, and go to state 52
+
+    $default  reduce using rule 54 (expression)
+
+
+state 34
+
+   75 literal_const: CONST_BOOL .
+
+    $default  reduce using rule 75 (literal_const)
+
+
+state 35
+
+   71 literal_const: CONST_INT .
+
+    $default  reduce using rule 71 (literal_const)
+
+
+state 36
+
+   72 literal_const: CONST_REAL .
+
+    $default  reduce using rule 72 (literal_const)
+
+
+state 37
+
+   74 literal_const: CONST_STRING .
+
+    $default  reduce using rule 74 (literal_const)
+
+
+state 38
+
+   73 literal_const: CONST_CHAR .
+
+    $default  reduce using rule 73 (literal_const)
+
+
+state 39
+
+   56 expression: '-' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 53
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 40
+
+   51 expression: '(' . expression ')'
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 54
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 41
+
+    8 const_dec: VAL ID '=' expression .
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    $default  reduce using rule 8 (const_dec)
+
+
+state 42
+
+   52 expression: literal_const .
+
+    $default  reduce using rule 52 (expression)
+
+
+state 43
+
+   53 expression: function_invocation .
+
+    $default  reduce using rule 53 (expression)
+
+
+state 44
+
+    9 var_dec: VAR ID ':' type . '=' expression
+   10        | VAR ID ':' type .
+   12        | VAR ID ':' type . '[' CONST_INT ']'
+
+    '='  shift, and go to state 68
+    '['  shift, and go to state 69
+
+    $default  reduce using rule 10 (var_dec)
+
+
+state 45
+
+   11 var_dec: VAR ID '=' expression .
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    $default  reduce using rule 11 (var_dec)
+
+
+state 46
+
+   29 return_type: ':' . type
+
+    BOOLEAN  shift, and go to state 26
+    CHAR     shift, and go to state 27
+    FLOAT    shift, and go to state 28
+    INT      shift, and go to state 29
+    STRING   shift, and go to state 30
+
+    type  go to state 70
+
+
+state 47
+
+   22 method_dec: DEF ID @2 . '(' formal_args ')' return_type @3 '{' var_const_decs_statements '}'
+
+    '('  shift, and go to state 71
+
+
+state 48
+
+   24 method_dec: DEF ID return_type . @4 '{' var_const_decs_statements '}'
+
+    $default  reduce using rule 23 (@4)
+
+    @4  go to state 72
+
+
+state 49
+
+    7 const_dec: VAL ID ':' type '=' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 73
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 50
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   68           | NOT expression .
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 68 (expression)]
+    $default  reduce using rule 68 (expression)
+
+
+state 51
+
+   55 expression: ID '[' . expression ']'
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 74
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 52
+
+   76 function_invocation: ID '(' . comma_separated_expression ')'
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    $default  reduce using rule 79 (comma_separated_expression)
+
+    expression                  go to state 75
+    literal_const               go to state 42
+    function_invocation         go to state 43
+    comma_separated_expression  go to state 76
+
+
+state 53
+
+   56 expression: '-' expression .
+   57           | expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 56 (expression)]
+    $default  reduce using rule 56 (expression)
+
+
+state 54
+
+   51 expression: '(' expression . ')'
+   57           | expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    ')'  shift, and go to state 77
+    '%'  shift, and go to state 67
+
+
+state 55
+
+   62 expression: expression LT . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 78
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 56
+
+   63 expression: expression LE . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 79
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 57
+
+   64 expression: expression GT . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 80
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 58
+
+   65 expression: expression GE . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 81
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 59
+
+   67 expression: expression NE . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 82
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 60
+
+   66 expression: expression EE . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 83
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 61
+
+   69 expression: expression AND . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 84
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 62
+
+   70 expression: expression OR . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 85
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 63
+
+   60 expression: expression '+' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 86
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 64
+
+   61 expression: expression '-' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 87
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 65
+
+   58 expression: expression '*' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 88
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 66
+
+   59 expression: expression '/' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 89
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 67
+
+   57 expression: expression '%' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 90
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 68
+
+    9 var_dec: VAR ID ':' type '=' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 91
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 69
+
+   12 var_dec: VAR ID ':' type '[' . CONST_INT ']'
+
+    CONST_INT  shift, and go to state 92
+
+
+state 70
+
+   29 return_type: ':' type .
+
+    $default  reduce using rule 29 (return_type)
+
+
+state 71
+
+   22 method_dec: DEF ID @2 '(' . formal_args ')' return_type @3 '{' var_const_decs_statements '}'
+
+    ID  shift, and go to state 93
+
+    $default  reduce using rule 33 (formal_args)
+
+    formal_args  go to state 94
+    arg          go to state 95
+
+
+state 72
+
+   24 method_dec: DEF ID return_type @4 . '{' var_const_decs_statements '}'
+
+    '{'  shift, and go to state 96
+
+
+state 73
+
+    7 const_dec: VAL ID ':' type '=' expression .
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    $default  reduce using rule 7 (const_dec)
+
+
+state 74
+
+   55 expression: ID '[' expression . ']'
+   57           | expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    ']'  shift, and go to state 97
+    '%'  shift, and go to state 67
+
+
+state 75
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+   77 comma_separated_expression: expression .
+   78                           | expression . ',' comma_separated_expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    ','  shift, and go to state 98
+    '%'  shift, and go to state 67
+
+    $default  reduce using rule 77 (comma_separated_expression)
+
+
+state 76
+
+   76 function_invocation: ID '(' comma_separated_expression . ')'
+
+    ')'  shift, and go to state 99
+
+
+state 77
+
+   51 expression: '(' expression ')' .
+
+    $default  reduce using rule 51 (expression)
+
+
+state 78
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   62           | expression LT expression .
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 62 (expression)]
+    $default  reduce using rule 62 (expression)
+
+
+state 79
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   63           | expression LE expression .
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 63 (expression)]
+    $default  reduce using rule 63 (expression)
+
+
+state 80
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   64           | expression GT expression .
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 64 (expression)]
+    $default  reduce using rule 64 (expression)
+
+
+state 81
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   65           | expression GE expression .
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 65 (expression)]
+    $default  reduce using rule 65 (expression)
+
+
+state 82
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   67           | expression NE expression .
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 67 (expression)]
+    $default  reduce using rule 67 (expression)
+
+
+state 83
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   66           | expression EE expression .
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 66 (expression)]
+    $default  reduce using rule 66 (expression)
+
+
+state 84
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   69           | expression AND expression .
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 69 (expression)]
+    $default  reduce using rule 69 (expression)
+
+
+state 85
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+   70           | expression OR expression .
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 70 (expression)]
+    $default  reduce using rule 70 (expression)
+
+
+state 86
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   60           | expression '+' expression .
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 60 (expression)]
+    $default  reduce using rule 60 (expression)
+
+
+state 87
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   61           | expression '-' expression .
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 61 (expression)]
+    $default  reduce using rule 61 (expression)
+
+
+state 88
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   58           | expression '*' expression .
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 58 (expression)]
+    $default  reduce using rule 58 (expression)
+
+
+state 89
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   59           | expression '/' expression .
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    '%'  shift, and go to state 67
+
+    '%'       [reduce using rule 59 (expression)]
+    $default  reduce using rule 59 (expression)
+
+
+state 90
+
+   57 expression: expression . '%' expression
+   57           | expression '%' expression .
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    LT        [reduce using rule 57 (expression)]
+    LE        [reduce using rule 57 (expression)]
+    GT        [reduce using rule 57 (expression)]
+    GE        [reduce using rule 57 (expression)]
+    NE        [reduce using rule 57 (expression)]
+    EE        [reduce using rule 57 (expression)]
+    AND       [reduce using rule 57 (expression)]
+    OR        [reduce using rule 57 (expression)]
+    '+'       [reduce using rule 57 (expression)]
+    '-'       [reduce using rule 57 (expression)]
+    '*'       [reduce using rule 57 (expression)]
+    '/'       [reduce using rule 57 (expression)]
+    '%'       [reduce using rule 57 (expression)]
+    $default  reduce using rule 57 (expression)
+
+
+state 91
+
+    9 var_dec: VAR ID ':' type '=' expression .
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    $default  reduce using rule 9 (var_dec)
+
+
+state 92
+
+   12 var_dec: VAR ID ':' type '[' CONST_INT . ']'
+
+    ']'  shift, and go to state 100
+
+
+state 93
+
+   34 arg: ID . ':' type
+
+    ':'  shift, and go to state 101
+
+
+state 94
+
+   22 method_dec: DEF ID @2 '(' formal_args . ')' return_type @3 '{' var_const_decs_statements '}'
+
+    ')'  shift, and go to state 102
+
+
+state 95
+
+   31 formal_args: arg .
+   32            | arg . ',' formal_args
+
+    ','  shift, and go to state 103
+
+    $default  reduce using rule 31 (formal_args)
+
+
+state 96
+
+   24 method_dec: DEF ID return_type @4 '{' . var_const_decs_statements '}'
+
+    FOR      shift, and go to state 104
+    IF       shift, and go to state 105
+    PRINT    shift, and go to state 106
+    PRINTLN  shift, and go to state 107
+    RETURN   shift, and go to state 108
+    VAL      shift, and go to state 7
+    VAR      shift, and go to state 8
+    WHILE    shift, and go to state 109
+    READ     shift, and go to state 110
+    ID       shift, and go to state 111
+    '{'      shift, and go to state 112
+
+    $default  reduce using rule 26 (var_const_decs_statements)
+
+    var_const_dec              go to state 113
+    const_dec                  go to state 11
+    var_dec                    go to state 12
+    var_const_decs_statements  go to state 114
+    var_const_decs_statement   go to state 115
+    statement                  go to state 116
+    simple_statement           go to state 117
+    block                      go to state 118
+    condition                  go to state 119
+    loop                       go to state 120
+    procedure_invocation       go to state 121
+
+
+state 97
+
+   55 expression: ID '[' expression ']' .
+
+    $default  reduce using rule 55 (expression)
+
+
+state 98
+
+   78 comma_separated_expression: expression ',' . comma_separated_expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    $default  reduce using rule 79 (comma_separated_expression)
+
+    expression                  go to state 75
+    literal_const               go to state 42
+    function_invocation         go to state 43
+    comma_separated_expression  go to state 122
+
+
+state 99
+
+   76 function_invocation: ID '(' comma_separated_expression ')' .
+
+    $default  reduce using rule 76 (function_invocation)
+
+
+state 100
+
+   12 var_dec: VAR ID ':' type '[' CONST_INT ']' .
+
+    $default  reduce using rule 12 (var_dec)
+
+
+state 101
+
+   34 arg: ID ':' . type
+
+    BOOLEAN  shift, and go to state 26
+    CHAR     shift, and go to state 27
+    FLOAT    shift, and go to state 28
+    INT      shift, and go to state 29
+    STRING   shift, and go to state 30
+
+    type  go to state 123
+
+
+state 102
+
+   22 method_dec: DEF ID @2 '(' formal_args ')' . return_type @3 '{' var_const_decs_statements '}'
+
+    ':'  shift, and go to state 46
+
+    $default  reduce using rule 30 (return_type)
+
+    return_type  go to state 124
+
+
+state 103
+
+   32 formal_args: arg ',' . formal_args
+
+    ID  shift, and go to state 93
+
+    $default  reduce using rule 33 (formal_args)
+
+    formal_args  go to state 125
+    arg          go to state 95
+
+
+state 104
+
+   94 loop: FOR . '(' ID LT '-' CONST_INT TO CONST_INT ')' @12 block_or_simple_statement
+
+    '('  shift, and go to state 126
+
+
+state 105
+
+   84 condition: IF . '(' expression ')' @8 else
+
+    '('  shift, and go to state 127
+
+
+state 106
+
+   45 simple_statement: PRINT . @5 expression
+
+    $default  reduce using rule 44 (@5)
+
+    @5  go to state 128
+
+
+state 107
+
+   47 simple_statement: PRINTLN . @6 expression
+
+    $default  reduce using rule 46 (@6)
+
+    @6  go to state 129
+
+
+state 108
+
+   49 simple_statement: RETURN . expression
+   50                 | RETURN .
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    ID        [reduce using rule 50 (simple_statement)]
+    $default  reduce using rule 50 (simple_statement)
+
+    expression           go to state 130
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 109
+
+   92 loop: WHILE . @10 '(' expression ')' @11 block_or_simple_statement
+
+    $default  reduce using rule 90 (@10)
+
+    @10  go to state 131
+
+
+state 110
+
+   48 simple_statement: READ . ID
+
+    ID  shift, and go to state 132
+
+
+state 111
+
+   42 simple_statement: ID . '=' expression
+   43                 | ID . '[' expression ']' '=' expression
+   95 procedure_invocation: ID .
+   96                     | ID . '(' comma_separated_expression ')'
+
+    '='  shift, and go to state 133
+    '['  shift, and go to state 134
+    '('  shift, and go to state 135
+
+    $default  reduce using rule 95 (procedure_invocation)
+
+
+state 112
+
+   81 block: '{' . @7 var_const_decs one_or_more_statements '}'
+
+    $default  reduce using rule 80 (@7)
+
+    @7  go to state 136
+
+
+state 113
+
+   27 var_const_decs_statement: var_const_dec .
+
+    $default  reduce using rule 27 (var_const_decs_statement)
+
+
+state 114
+
+   24 method_dec: DEF ID return_type @4 '{' var_const_decs_statements . '}'
+
+    '}'  shift, and go to state 137
+
+
+state 115
+
+   25 var_const_decs_statements: var_const_decs_statement . var_const_decs_statements
+
+    FOR      shift, and go to state 104
+    IF       shift, and go to state 105
+    PRINT    shift, and go to state 106
+    PRINTLN  shift, and go to state 107
+    RETURN   shift, and go to state 108
+    VAL      shift, and go to state 7
+    VAR      shift, and go to state 8
+    WHILE    shift, and go to state 109
+    READ     shift, and go to state 110
+    ID       shift, and go to state 111
+    '{'      shift, and go to state 112
+
+    $default  reduce using rule 26 (var_const_decs_statements)
+
+    var_const_dec              go to state 113
+    const_dec                  go to state 11
+    var_dec                    go to state 12
+    var_const_decs_statements  go to state 138
+    var_const_decs_statement   go to state 115
+    statement                  go to state 116
+    simple_statement           go to state 117
+    block                      go to state 118
+    condition                  go to state 119
+    loop                       go to state 120
+    procedure_invocation       go to state 121
+
+
+state 116
+
+   28 var_const_decs_statement: statement .
+
+    $default  reduce using rule 28 (var_const_decs_statement)
+
+
+state 117
+
+   37 statement: simple_statement .
+
+    $default  reduce using rule 37 (statement)
+
+
+state 118
+
+   38 statement: block .
+
+    $default  reduce using rule 38 (statement)
+
+
+state 119
+
+   39 statement: condition .
+
+    $default  reduce using rule 39 (statement)
+
+
+state 120
+
+   40 statement: loop .
+
+    $default  reduce using rule 40 (statement)
+
+
+state 121
+
+   41 statement: procedure_invocation .
+
+    $default  reduce using rule 41 (statement)
+
+
+state 122
+
+   78 comma_separated_expression: expression ',' comma_separated_expression .
+
+    $default  reduce using rule 78 (comma_separated_expression)
+
+
+state 123
+
+   34 arg: ID ':' type .
+
+    $default  reduce using rule 34 (arg)
+
+
+state 124
+
+   22 method_dec: DEF ID @2 '(' formal_args ')' return_type . @3 '{' var_const_decs_statements '}'
+
+    $default  reduce using rule 21 (@3)
+
+    @3  go to state 139
+
+
+state 125
+
+   32 formal_args: arg ',' formal_args .
+
+    $default  reduce using rule 32 (formal_args)
+
+
+state 126
+
+   94 loop: FOR '(' . ID LT '-' CONST_INT TO CONST_INT ')' @12 block_or_simple_statement
+
+    ID  shift, and go to state 140
+
+
+state 127
+
+   84 condition: IF '(' . expression ')' @8 else
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 141
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 128
+
+   45 simple_statement: PRINT @5 . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 142
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 129
+
+   47 simple_statement: PRINTLN @6 . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 143
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 130
+
+   49 simple_statement: RETURN expression .
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    $default  reduce using rule 49 (simple_statement)
+
+
+state 131
+
+   92 loop: WHILE @10 . '(' expression ')' @11 block_or_simple_statement
+
+    '('  shift, and go to state 144
+
+
+state 132
+
+   48 simple_statement: READ ID .
+
+    $default  reduce using rule 48 (simple_statement)
+
+
+state 133
+
+   42 simple_statement: ID '=' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 145
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 134
+
+   43 simple_statement: ID '[' . expression ']' '=' expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 146
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 135
+
+   96 procedure_invocation: ID '(' . comma_separated_expression ')'
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    $default  reduce using rule 79 (comma_separated_expression)
+
+    expression                  go to state 75
+    literal_const               go to state 42
+    function_invocation         go to state 43
+    comma_separated_expression  go to state 147
+
+
+state 136
+
+   81 block: '{' @7 . var_const_decs one_or_more_statements '}'
+
+    VAL  shift, and go to state 7
+    VAR  shift, and go to state 8
+
+    $default  reduce using rule 4 (var_const_decs)
+
+    var_const_decs  go to state 148
+    var_const_dec   go to state 10
+    const_dec       go to state 11
+    var_dec         go to state 12
+
+
+state 137
+
+   24 method_dec: DEF ID return_type @4 '{' var_const_decs_statements '}' .
+
+    $default  reduce using rule 24 (method_dec)
+
+
+state 138
+
+   25 var_const_decs_statements: var_const_decs_statement var_const_decs_statements .
+
+    $default  reduce using rule 25 (var_const_decs_statements)
+
+
+state 139
+
+   22 method_dec: DEF ID @2 '(' formal_args ')' return_type @3 . '{' var_const_decs_statements '}'
+
+    '{'  shift, and go to state 149
+
+
+state 140
+
+   94 loop: FOR '(' ID . LT '-' CONST_INT TO CONST_INT ')' @12 block_or_simple_statement
+
+    LT  shift, and go to state 150
+
+
+state 141
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+   84 condition: IF '(' expression . ')' @8 else
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    ')'  shift, and go to state 151
+    '%'  shift, and go to state 67
+
+
+state 142
+
+   45 simple_statement: PRINT @5 expression .
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    $default  reduce using rule 45 (simple_statement)
+
+
+state 143
+
+   47 simple_statement: PRINTLN @6 expression .
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    $default  reduce using rule 47 (simple_statement)
+
+
+state 144
+
+   92 loop: WHILE @10 '(' . expression ')' @11 block_or_simple_statement
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 152
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 145
+
+   42 simple_statement: ID '=' expression .
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    $default  reduce using rule 42 (simple_statement)
+
+
+state 146
+
+   43 simple_statement: ID '[' expression . ']' '=' expression
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    ']'  shift, and go to state 153
+    '%'  shift, and go to state 67
+
+
+state 147
+
+   96 procedure_invocation: ID '(' comma_separated_expression . ')'
+
+    ')'  shift, and go to state 154
+
+
+state 148
+
+   81 block: '{' @7 var_const_decs . one_or_more_statements '}'
+
+    FOR      shift, and go to state 104
+    IF       shift, and go to state 105
+    PRINT    shift, and go to state 106
+    PRINTLN  shift, and go to state 107
+    RETURN   shift, and go to state 108
+    WHILE    shift, and go to state 109
+    READ     shift, and go to state 110
+    ID       shift, and go to state 111
+    '{'      shift, and go to state 112
+
+    statement               go to state 155
+    simple_statement        go to state 117
+    block                   go to state 118
+    one_or_more_statements  go to state 156
+    condition               go to state 119
+    loop                    go to state 120
+    procedure_invocation    go to state 121
+
+
+state 149
+
+   22 method_dec: DEF ID @2 '(' formal_args ')' return_type @3 '{' . var_const_decs_statements '}'
+
+    FOR      shift, and go to state 104
+    IF       shift, and go to state 105
+    PRINT    shift, and go to state 106
+    PRINTLN  shift, and go to state 107
+    RETURN   shift, and go to state 108
+    VAL      shift, and go to state 7
+    VAR      shift, and go to state 8
+    WHILE    shift, and go to state 109
+    READ     shift, and go to state 110
+    ID       shift, and go to state 111
+    '{'      shift, and go to state 112
+
+    $default  reduce using rule 26 (var_const_decs_statements)
+
+    var_const_dec              go to state 113
+    const_dec                  go to state 11
+    var_dec                    go to state 12
+    var_const_decs_statements  go to state 157
+    var_const_decs_statement   go to state 115
+    statement                  go to state 116
+    simple_statement           go to state 117
+    block                      go to state 118
+    condition                  go to state 119
+    loop                       go to state 120
+    procedure_invocation       go to state 121
+
+
+state 150
+
+   94 loop: FOR '(' ID LT . '-' CONST_INT TO CONST_INT ')' @12 block_or_simple_statement
+
+    '-'  shift, and go to state 158
+
+
+state 151
+
+   84 condition: IF '(' expression ')' . @8 else
+
+    $default  reduce using rule 83 (@8)
+
+    @8  go to state 159
+
+
+state 152
+
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+   92 loop: WHILE @10 '(' expression . ')' @11 block_or_simple_statement
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    ')'  shift, and go to state 160
+    '%'  shift, and go to state 67
+
+
+state 153
+
+   43 simple_statement: ID '[' expression ']' . '=' expression
+
+    '='  shift, and go to state 161
+
+
+state 154
+
+   96 procedure_invocation: ID '(' comma_separated_expression ')' .
+
+    $default  reduce using rule 96 (procedure_invocation)
+
+
+state 155
+
+   82 one_or_more_statements: statement . statements
+
+    FOR      shift, and go to state 104
+    IF       shift, and go to state 105
+    PRINT    shift, and go to state 106
+    PRINTLN  shift, and go to state 107
+    RETURN   shift, and go to state 108
+    WHILE    shift, and go to state 109
+    READ     shift, and go to state 110
+    ID       shift, and go to state 111
+    '{'      shift, and go to state 112
+
+    $default  reduce using rule 36 (statements)
+
+    statements            go to state 162
+    statement             go to state 163
+    simple_statement      go to state 117
+    block                 go to state 118
+    condition             go to state 119
+    loop                  go to state 120
+    procedure_invocation  go to state 121
+
+
+state 156
+
+   81 block: '{' @7 var_const_decs one_or_more_statements . '}'
+
+    '}'  shift, and go to state 164
+
+
+state 157
+
+   22 method_dec: DEF ID @2 '(' formal_args ')' return_type @3 '{' var_const_decs_statements . '}'
+
+    '}'  shift, and go to state 165
+
+
+state 158
+
+   94 loop: FOR '(' ID LT '-' . CONST_INT TO CONST_INT ')' @12 block_or_simple_statement
+
+    CONST_INT  shift, and go to state 166
+
+
+state 159
+
+   84 condition: IF '(' expression ')' @8 . else
+
+    PRINT    shift, and go to state 106
+    PRINTLN  shift, and go to state 107
+    RETURN   shift, and go to state 108
+    READ     shift, and go to state 110
+    ID       shift, and go to state 167
+    '{'      shift, and go to state 112
+
+    simple_statement           go to state 168
+    block                      go to state 169
+    else                       go to state 170
+    block_or_simple_statement  go to state 171
+
+
+state 160
+
+   92 loop: WHILE @10 '(' expression ')' . @11 block_or_simple_statement
+
+    $default  reduce using rule 91 (@11)
+
+    @11  go to state 172
+
+
+state 161
+
+   43 simple_statement: ID '[' expression ']' '=' . expression
+
+    NOT           shift, and go to state 32
+    ID            shift, and go to state 33
+    CONST_BOOL    shift, and go to state 34
+    CONST_INT     shift, and go to state 35
+    CONST_REAL    shift, and go to state 36
+    CONST_STRING  shift, and go to state 37
+    CONST_CHAR    shift, and go to state 38
+    '-'           shift, and go to state 39
+    '('           shift, and go to state 40
+
+    expression           go to state 173
+    literal_const        go to state 42
+    function_invocation  go to state 43
+
+
+state 162
+
+   82 one_or_more_statements: statement statements .
+
+    $default  reduce using rule 82 (one_or_more_statements)
+
+
+state 163
+
+   35 statements: statement . statements
+
+    FOR      shift, and go to state 104
+    IF       shift, and go to state 105
+    PRINT    shift, and go to state 106
+    PRINTLN  shift, and go to state 107
+    RETURN   shift, and go to state 108
+    WHILE    shift, and go to state 109
+    READ     shift, and go to state 110
+    ID       shift, and go to state 111
+    '{'      shift, and go to state 112
+
+    $default  reduce using rule 36 (statements)
+
+    statements            go to state 174
+    statement             go to state 163
+    simple_statement      go to state 117
+    block                 go to state 118
+    condition             go to state 119
+    loop                  go to state 120
+    procedure_invocation  go to state 121
+
+
+state 164
+
+   81 block: '{' @7 var_const_decs one_or_more_statements '}' .
+
+    $default  reduce using rule 81 (block)
+
+
+state 165
+
+   22 method_dec: DEF ID @2 '(' formal_args ')' return_type @3 '{' var_const_decs_statements '}' .
+
+    $default  reduce using rule 22 (method_dec)
+
+
+state 166
+
+   94 loop: FOR '(' ID LT '-' CONST_INT . TO CONST_INT ')' @12 block_or_simple_statement
+
+    TO  shift, and go to state 175
+
+
+state 167
+
+   42 simple_statement: ID . '=' expression
+   43                 | ID . '[' expression ']' '=' expression
+
+    '='  shift, and go to state 133
+    '['  shift, and go to state 134
+
+
+state 168
+
+   89 block_or_simple_statement: simple_statement .
+
+    $default  reduce using rule 89 (block_or_simple_statement)
+
+
+state 169
+
+   88 block_or_simple_statement: block .
+
+    $default  reduce using rule 88 (block_or_simple_statement)
+
+
+state 170
+
+   84 condition: IF '(' expression ')' @8 else .
+
+    $default  reduce using rule 84 (condition)
+
+
+state 171
+
+   86 else: block_or_simple_statement . ELSE @9 block_or_simple_statement
+   87     | block_or_simple_statement .
+
+    ELSE  shift, and go to state 176
+
+    $default  reduce using rule 87 (else)
+
+
+state 172
+
+   92 loop: WHILE @10 '(' expression ')' @11 . block_or_simple_statement
+
+    PRINT    shift, and go to state 106
+    PRINTLN  shift, and go to state 107
+    RETURN   shift, and go to state 108
+    READ     shift, and go to state 110
+    ID       shift, and go to state 167
+    '{'      shift, and go to state 112
+
+    simple_statement           go to state 168
+    block                      go to state 169
+    block_or_simple_statement  go to state 177
+
+
+state 173
+
+   43 simple_statement: ID '[' expression ']' '=' expression .
+   57 expression: expression . '%' expression
+   58           | expression . '*' expression
+   59           | expression . '/' expression
+   60           | expression . '+' expression
+   61           | expression . '-' expression
+   62           | expression . LT expression
+   63           | expression . LE expression
+   64           | expression . GT expression
+   65           | expression . GE expression
+   66           | expression . EE expression
+   67           | expression . NE expression
+   69           | expression . AND expression
+   70           | expression . OR expression
+
+    LT   shift, and go to state 55
+    LE   shift, and go to state 56
+    GT   shift, and go to state 57
+    GE   shift, and go to state 58
+    NE   shift, and go to state 59
+    EE   shift, and go to state 60
+    AND  shift, and go to state 61
+    OR   shift, and go to state 62
+    '+'  shift, and go to state 63
+    '-'  shift, and go to state 64
+    '*'  shift, and go to state 65
+    '/'  shift, and go to state 66
+    '%'  shift, and go to state 67
+
+    $default  reduce using rule 43 (simple_statement)
+
+
+state 174
+
+   35 statements: statement statements .
+
+    $default  reduce using rule 35 (statements)
+
+
+state 175
+
+   94 loop: FOR '(' ID LT '-' CONST_INT TO . CONST_INT ')' @12 block_or_simple_statement
+
+    CONST_INT  shift, and go to state 178
+
+
+state 176
+
+   86 else: block_or_simple_statement ELSE . @9 block_or_simple_statement
+
+    $default  reduce using rule 85 (@9)
+
+    @9  go to state 179
+
+
+state 177
+
+   92 loop: WHILE @10 '(' expression ')' @11 block_or_simple_statement .
+
+    $default  reduce using rule 92 (loop)
+
+
+state 178
+
+   94 loop: FOR '(' ID LT '-' CONST_INT TO CONST_INT . ')' @12 block_or_simple_statement
+
+    ')'  shift, and go to state 180
+
+
+state 179
+
+   86 else: block_or_simple_statement ELSE @9 . block_or_simple_statement
+
+    PRINT    shift, and go to state 106
+    PRINTLN  shift, and go to state 107
+    RETURN   shift, and go to state 108
+    READ     shift, and go to state 110
+    ID       shift, and go to state 167
+    '{'      shift, and go to state 112
+
+    simple_statement           go to state 168
+    block                      go to state 169
+    block_or_simple_statement  go to state 181
+
+
+state 180
+
+   94 loop: FOR '(' ID LT '-' CONST_INT TO CONST_INT ')' . @12 block_or_simple_statement
+
+    $default  reduce using rule 93 (@12)
+
+    @12  go to state 182
+
+
+state 181
+
+   86 else: block_or_simple_statement ELSE @9 block_or_simple_statement .
+
+    $default  reduce using rule 86 (else)
+
+
+state 182
+
+   94 loop: FOR '(' ID LT '-' CONST_INT TO CONST_INT ')' @12 . block_or_simple_statement
+
+    PRINT    shift, and go to state 106
+    PRINTLN  shift, and go to state 107
+    RETURN   shift, and go to state 108
+    READ     shift, and go to state 110
+    ID       shift, and go to state 167
+    '{'      shift, and go to state 112
+
+    simple_statement           go to state 168
+    block                      go to state 169
+    block_or_simple_statement  go to state 183
+
+
+state 183
+
+   94 loop: FOR '(' ID LT '-' CONST_INT TO CONST_INT ')' @12 block_or_simple_statement .
+
+    $default  reduce using rule 94 (loop)

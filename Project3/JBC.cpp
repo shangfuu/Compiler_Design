@@ -245,14 +245,14 @@ void JBC_WhileBegin()
 
 void JBC_WhileEnd()
 {
-    JBC << "\t\tgoto L" << gotoM.Lbase(0) << ":" << endl;
+    JBC << "\t\tgoto L" << gotoM.Lbase(0) << endl;
     JBC << "\tL" << gotoM.Lbase(1) << ":" << endl;
     gotoM.popL();
 }
 
 void JBC_WhileCondJump()
 {
-    JBC << "\t\tifeq L" << gotoM.Lbase(1) << ":" << endl;;
+    JBC << "\t\tifeq L" << gotoM.Lbase(1) << endl;;
 }
 
 /* Tool */
