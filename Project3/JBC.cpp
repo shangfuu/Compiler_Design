@@ -52,7 +52,7 @@ void JBC_AssignLocal(int index)
 // Constant
 void JBC_PushInt(int value)
 {
-    JBC << "\t\tsipush " << value << endl;
+    JBC << "\t\tldc " << value << endl;
 }
 
 void JBC_PushStr(string str)
