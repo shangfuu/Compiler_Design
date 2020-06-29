@@ -376,11 +376,6 @@ arg:
                 }
                 ;
 
-statements:     
-                statement statements
-                | /* zero or more */
-                ;
-
 statement:
                 simple_statement
                 | block
@@ -1088,16 +1083,12 @@ block:
                     // Create a new child table
                     symbol_tables.add_table();
                 }
-                var_const_decs one_or_more_statements '}'
+                var_const_decs_statements '}'
                 {
                     symbol_tables.dump();
                     // Pop the current table.
                     symbol_tables.pop_table();
                 }
-                ;
-
-one_or_more_statements:
-                statement statements /* one or more*/
                 ;
 
 condition:

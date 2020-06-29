@@ -38,9 +38,10 @@ object example {
       n = n + 1
     
     println(n)
-    // n = 0
-    // while (n > -5)
-    //   n = n - 1
+    n = 0
+    while (n > -5)
+      n = n - 1
+    println(n)
 
     println ("Hello World")
   }
