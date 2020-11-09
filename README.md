@@ -12,9 +12,10 @@ Your assignment is to write an LALR(1) parser for the Scala− language. You wil
 
 ### Assignment
 You first need to write your symbol table, which should be able to perform the following tasks:
-• Push a symbol table when entering a scope and pop it when exiting the scope.
-• Insert entries for variables, constants, and procedure declarations.
-• Lookup entries in the symbol table.
+- Push a symbol table when entering a scope and pop it when exiting the scope.
+- Insert entries for variables, constants, and procedure declarations.
+- Lookup entries in the symbol table.
+
 You then must create an LALR(1) grammar using yacc. You need to write the grammar following the syntactic and semantic definitions in the following sections. Once the LALR(1) grammar is defined, you can then execute yacc to produce a C program called “y.tab.c”, which contains the parsing function yyparse().
 You must supply a main function to invoke yyparse(). The parsing function yyparse() calls yylex(). You will have to revise your scanner function yylex().
 
@@ -23,8 +24,8 @@ Your assignment is to generate code (in Java assembly language) for the Scala−
 
 ### Assignment
 Your assignment will be divided into the following parts:
-• initialization
-• parsing declarations for constants and variables
-• code generation for expressions and statements
-• code generation for conditional statements and while loops
-• code generation for procedure calls
+- initialization
+- parsing declarations for constants and variables
+- code generation for expressions and statements
+- code generation for conditional statements and while loops
+- code generation for procedure calls
